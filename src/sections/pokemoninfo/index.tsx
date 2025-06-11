@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#eeff00', 
     marginBottom: 20,
-    textShadowColor: 'rgb(98, 255, 0)', // Sombra más pronunciada
+    textShadowColor: 'rgb(98, 255, 0)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
   },
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 8,
-    color: '#ffffff', // Color de texto oscuro para contraste
+    color: '#ffffff',
   },
   flatListContent: {
     justifyContent: 'center',
@@ -252,17 +252,21 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 7,
     borderWidth: 3,
-    borderColor: '#eeff00', // Borde más claro
+    borderColor: '#eeff00', 
   },
   listItemText: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#092e00', // Color de texto oscuro para contraste
     textTransform: 'capitalize',
+    color: '#eeff00',
+    textShadowColor: 'rgb(0, 0, 0)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
+    textAlign: 'center',
   },
   pokemonCard: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)', // Fondo blanco semitransparente
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
     borderRadius: 20,
     margin: 20,
     padding: 30,
