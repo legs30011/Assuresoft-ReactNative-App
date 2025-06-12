@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   homeScreenScrollViewContent: {
     flexGrow: 1,
-    paddingTop: 130, 
+    paddingTop: 70, 
     backgroundColor: '#000000',
   },
 });
