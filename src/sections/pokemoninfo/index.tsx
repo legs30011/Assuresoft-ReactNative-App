@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   ImageBackground,
+  ScrollView,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Carousel from 'react-native-reanimated-carousel';
@@ -18,6 +19,7 @@ const { width } = Dimensions.get('window');
 interface PokemonListItem {
   name: string;
   url: string;
+  imageUrl?: string;
 }
 
 interface PokemonData {
@@ -44,6 +46,32 @@ interface PokemonData {
   height: number;
   weight: number;
 }
+const PokemonCarouselItem = React.memo(({ item, onPress }: { item: PokemonListItem; onPress: (name: string) => void }) => (
+  <TouchableOpacity
+    style={styles.carouselItem}
+    onPress={() => onPress(item.name)}
+  >
+    {item.imageUrl ? (
+      <ImageBackground
+        source={{ uri: item.imageUrl }}
+        style={styles.carouselItemBackground}
+        imageStyle={styles.carouselItemImageStyle}
+      >
+        {/* Capa semitransparente para opacar la imagen y mejorar la legibilidad del texto */}
+        <View style={styles.carouselItemOverlay}>
+          <Text style={styles.carouselItemText}>{item.name.toUpperCase()}</Text>
+        </View>
+      </ImageBackground>
+    ) : (
+      // Fallback si la imagen no está disponible
+      <View style={styles.carouselItemNoImage}>
+        <Text style={styles.carouselItemText}>{item.name.toUpperCase()}</Text>
+        <Text style={styles.messageTextSmall}>Cargando imagen...</Text>
+      </View>
+    )}
+  </TouchableOpacity>
+));
+
 
 const Pokemon = (): React.JSX.Element => {
   const [allPokemons, setAllPokemons] = useState<PokemonListItem[]>([]);
@@ -63,8 +91,20 @@ const Pokemon = (): React.JSX.Element => {
         throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
       }
       const data = await response.json();
-      setAllPokemons(data.results);
-      setFilteredPokemons(data.results);
+      const initialPokemons: PokemonListItem[] = data.results;
+      const pokemonDetailsPromises = initialPokemons.map(async (pokemon) => {
+        const detailResponse = await fetch(pokemon.url);
+        if (!detailResponse.ok) {
+          console.warn(`No se pudo cargar la imagen para ${pokemon.name}.`);
+          return { ...pokemon, imageUrl: undefined };
+        }
+        const detailData = await detailResponse.json();
+        return { ...pokemon, imageUrl: detailData.sprites?.front_default };
+      });
+      const pokemonsWithImages = await Promise.all(pokemonDetailsPromises);
+
+      setAllPokemons(pokemonsWithImages);
+      setFilteredPokemons(pokemonsWithImages);
     } catch (err: any) {
       setError(err.message || 'Ocurrió un error desconocido al cargar los Pokémon.');
     } finally {
@@ -111,15 +151,6 @@ const Pokemon = (): React.JSX.Element => {
     }
   };
 
-  const renderCarouselItem = ({ item }: { item: PokemonListItem }) => (
-    <TouchableOpacity
-      style={styles.carouselItem}
-      onPress={() => fetchPokemonDetails(item.name)}
-    >
-      <Text style={styles.carouselItemText}>{item.name.toUpperCase()}</Text>
-    </TouchableOpacity>
-  );
-
   if (loading) {
     return (
       <View style={styles.centeredContent}>
@@ -161,50 +192,54 @@ const Pokemon = (): React.JSX.Element => {
             <Text style={styles.messageText}>Cargando detalles...</Text>
           </View>
         ) : selectedPokemon ? (
-          <View style={styles.pokemonCard}>
-            <Text style={styles.pokemonName}>{selectedPokemon.name.toUpperCase()}</Text>
-            {selectedPokemon.sprites?.front_default ? (
-              <Image
-                source={{ uri: selectedPokemon.sprites.front_default }}
-                style={styles.pokemonImage}
-                onError={(e) => console.log('Error al cargar la imagen:', e.nativeEvent.error)}
-              />
-            ) : (
-              <Text style={styles.messageText}>No se encontró la imagen.</Text>
-            )}
+          <ScrollView contentContainerStyle={styles.pokemonCardScrollViewContent}>
+            <View style={styles.pokemonCard}>
+              <Text style={styles.pokemonName}>{selectedPokemon.name.toUpperCase()}</Text>
+              {selectedPokemon.sprites?.front_default ? (
+                <Image
+                  source={{ uri: selectedPokemon.sprites.front_default }}
+                  style={styles.pokemonImageDetail}
+                  onError={(e) => console.log('Error al cargar la imagen:', e.nativeEvent.error)}
+                />
+              ) : (
+                <Text style={styles.messageText}>No se encontró la imagen.</Text>
+              )}
 
-            <Text style={styles.detailText}>
-              ID: {selectedPokemon.id}
-            </Text>
-            <Text style={styles.detailText}>
-              Tipo(s): {selectedPokemon.types.map(t => t.type.name).join(', ')}
-            </Text>
-            <Text style={styles.detailText}>
-              Altura: {selectedPokemon.height / 10} m
-            </Text>
-            <Text style={styles.detailText}>
-              Peso: {selectedPokemon.weight / 10} kg
-            </Text>
-            <Text style={styles.detailText}>
-              Habilidades: {selectedPokemon.abilities.map(a => a.ability.name).join(', ')}
-            </Text>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => setSelectedPokemon(null)}
-            >
-              <Text style={styles.backButtonText}>Volver a la lista</Text>
-            </TouchableOpacity>
-          </View>
+              <Text style={styles.detailText}>
+                ID: {selectedPokemon.id}
+              </Text>
+              <Text style={styles.detailText}>
+                Tipo(s): {selectedPokemon.types.map(t => t.type.name).join(', ')}
+              </Text>
+              <Text style={styles.detailText}>
+                Altura: {selectedPokemon.height / 10} m
+              </Text>
+              <Text style={styles.detailText}>
+                Peso: {selectedPokemon.weight / 10} kg
+              </Text>
+              <Text style={styles.detailText}>
+                Habilidades: {selectedPokemon.abilities.map(a => a.ability.name).join(', ')}
+              </Text>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => setSelectedPokemon(null)}
+              >
+                <Text style={styles.backButtonText}>Volver a la lista</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
         ) : (
           <Carousel
             loop
             width={width * 0.9}
-            height={220}
+            height={400}
             autoPlay={false}
             data={filteredPokemons}
             scrollAnimationDuration={1000}
             onSnapToItem={(index) => console.log('current index:', index)}
-            renderItem={renderCarouselItem}
+            renderItem={({ item }) => (
+              <PokemonCarouselItem item={item} onPress={fetchPokemonDetails} />
+            )}
             mode="parallax"
             modeConfig={{
               parallaxScrollingScale: 0.9,
@@ -234,17 +269,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingTop: 9,
+    paddingTop: 10, 
   },
   title: {
     fontSize: 38,
     fontWeight: 'bold',
     color: '#eeff00', 
-    marginBottom: 5,
+    marginBottom: 5, 
     textShadowColor: 'rgba(0, 0, 0, 0.6)', 
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
-    marginTop: 10,
+    marginTop: 10, 
   },
   searchInput: {
     width: '90%',
@@ -252,10 +287,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     borderRadius: 25,
     paddingHorizontal: 20,
-    marginBottom: 8,
+    marginBottom: 5, 
     fontSize: 18,
     borderWidth: 1,
-    borderColor: '#eeff00', 
+    borderColor: '#eeff00',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
@@ -268,23 +303,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexGrow: 1,
-    marginTop: 0,
+    marginTop: 0, 
   },
   carouselItem: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     borderRadius: 20,
+    overflow: 'hidden',
     width: width * 0.78,
     height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.5,
     shadowRadius: 12,
     elevation: 15,
     borderWidth: 2,
-    borderColor: '#eeff00',
+    borderColor: '#eeff00', 
     marginHorizontal: 10,
+  },
+  carouselItemBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  carouselItemImageStyle: {
+    opacity: 0.25,
+    resizeMode: 'cover',
+  },
+  carouselItemOverlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
   },
   carouselItemText: {
     fontSize: 26,
@@ -294,57 +344,72 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
     textAlign: 'center',
-    paddingHorizontal: 10,
-    paddingTop: 10,
-    maxWidth: width * 0.7,
+  },
+  carouselItemNoImage: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    padding: 10,
+  },
+  messageTextSmall: {
+    fontSize: 14,
+    color: '#D3D3D3',
+    marginTop: 5,
+  },
+  pokemonCardScrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    paddingBottom: 20,
   },
   pokemonCard: {
-    flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderRadius: 20,
-    margin: 20,
-    padding: 30,
+    marginHorizontal: 20,
+    padding: 25,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 12,
     elevation: 15,
-    width: '95%',
-    maxWidth: 400,
+    width: '90%',
+    maxWidth: 380,
     borderWidth: 2,
     borderColor: '#eeff00',
   },
   pokemonName: {
-    fontSize: 40,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#eeff00',
-    marginBottom: 15,
+    marginBottom: 10,
     textTransform: 'capitalize',
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
   },
-  pokemonImage: {
-    width: width * 0.7,
-    height: width * 0.7,
+  pokemonImageDetail: {
+    width: width * 0.55,
+    height: width * 0.55,
     resizeMode: 'contain',
-    marginBottom: 25,
+    marginBottom: 20,
     backgroundColor: 'rgba(240, 240, 240, 0.2)',
     borderRadius: 15,
     borderWidth: 1,
     borderColor: '#eeff00',
   },
   detailText: {
-    fontSize: 20,
-    color: '#ffffff', 
-    marginBottom: 10,
+    fontSize: 18,
+    color: '#ffffff',
+    marginBottom: 8,
     textAlign: 'center',
-    lineHeight: 28,
+    lineHeight: 25,
   },
   messageText: {
     fontSize: 18,
-    color: '#D3D3D3', 
+    color: '#D3D3D3',
     marginTop: 15,
     textAlign: 'center',
   },
@@ -368,10 +433,10 @@ const styles = StyleSheet.create({
     minHeight: 200,
   },
   backButton: {
-    marginTop: 30,
+    marginTop: 25,
     backgroundColor: '#eeff00',
-    paddingVertical: 12,
-    paddingHorizontal: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -380,8 +445,8 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   backButtonText: {
-    color: '#fff',
-    fontSize: 20,
+    color: '#000000',
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });
