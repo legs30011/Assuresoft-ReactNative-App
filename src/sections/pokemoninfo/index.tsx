@@ -57,13 +57,11 @@ const PokemonCarouselItem = React.memo(({ item, onPress }: { item: PokemonListIt
         style={styles.carouselItemBackground}
         imageStyle={styles.carouselItemImageStyle}
       >
-        {/* Capa semitransparente para opacar la imagen y mejorar la legibilidad del texto */}
         <View style={styles.carouselItemOverlay}>
           <Text style={styles.carouselItemText}>{item.name.toUpperCase()}</Text>
         </View>
       </ImageBackground>
     ) : (
-      // Fallback si la imagen no está disponible
       <View style={styles.carouselItemNoImage}>
         <Text style={styles.carouselItemText}>{item.name.toUpperCase()}</Text>
         <Text style={styles.messageTextSmall}>Cargando imagen...</Text>
@@ -269,17 +267,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingTop: 10, 
+    paddingTop: 10,
   },
   title: {
     fontSize: 38,
     fontWeight: 'bold',
-    color: '#eeff00', 
-    marginBottom: 5, 
-    textShadowColor: 'rgba(0, 0, 0, 0.6)', 
+    color: '#eeff00',
+    marginBottom: 5,
+    textShadowColor: 'rgba(0, 0, 0, 0.6)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
-    marginTop: 10, 
+    marginTop: 10,
   },
   searchInput: {
     width: '90%',
@@ -287,7 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     borderRadius: 25,
     paddingHorizontal: 20,
-    marginBottom: 5, 
+    marginBottom: 5,
     fontSize: 18,
     borderWidth: 1,
     borderColor: '#eeff00',
@@ -303,7 +301,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexGrow: 1,
-    marginTop: 0, 
+    marginTop: 0,
   },
   carouselItem: {
     borderRadius: 20,
@@ -316,7 +314,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 15,
     borderWidth: 2,
-    borderColor: '#eeff00', 
+    borderColor: '#eeff00',
     marginHorizontal: 10,
   },
   carouselItemBackground: {

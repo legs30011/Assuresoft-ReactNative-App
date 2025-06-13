@@ -9,7 +9,7 @@ import Hero from './src/sections/hero';
 import Pokemon from './src/sections/pokemoninfo';
 import MenuScreen from './src/sections/menu';
 import ProfileScreen from './src/sections/profile';
-
+import PokemonListScreen from './src/sections/pokemonlist';
 import { navigationRef } from './src/navigation/RootNavigation';
 
 const Stack = createStackNavigator();
@@ -33,13 +33,14 @@ function App(): React.JSX.Element {
           <Stack.Navigator
             initialRouteName="Home"
             screenOptions={{
-              headerShown: false, 
+              headerShown: false,
               cardStyle: { backgroundColor: '#000000' },
             }}
           >
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Menu" component={MenuScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="PokemonListScreen" component={PokemonListScreen} options={{ title: 'Pokémon por Tipo' }} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
   },
   homeScreenScrollViewContent: {
     flexGrow: 1,
-    paddingTop: 70, 
+    paddingTop: 70,
     backgroundColor: '#000000',
   },
 });
