@@ -4,6 +4,7 @@ export type RootStackParamList = {
   Home: undefined;
   Menu: undefined;
   Profile: undefined;
+  PokemonListScreen: { type: string };
 };
 
 declare global {
@@ -12,6 +13,8 @@ declare global {
   }
 }
 
-export type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Mi Aplicacion'>;
+// Las propiedades de navegación para tus pantallas actuales
+export type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 export type MenuScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Menu'>;
+export type PokemonListScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PokemonListScreen'>;
 export type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profile'>;
