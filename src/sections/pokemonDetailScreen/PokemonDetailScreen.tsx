@@ -45,7 +45,7 @@ const POKEMON_TYPE_COLORS: { [key: string]: string } = {
   dark: '#707070',
 };
 
-// --- DEFINICIONES DE TIPOS (INTERFACES) ---
+// --- TYPE DEFINITIONS ---
 interface PokemonTypeSlot {
   slot: number;
   type: { name: string; url: string; };
@@ -86,7 +86,7 @@ interface GeneraEntry {
 interface PokemonSpeciesData {
   flavor_text_entries: FlavorTextEntry[];
   genera: GeneraEntry[];
-  evolution_chain: { url: string }; // URL de la cadena de evolución
+  evolution_chain: { url: string };
 }
 
 interface PokemonDetailData {
@@ -107,7 +107,6 @@ interface PokemonDetailCombinedData extends PokemonDetailData {
   genus: string;
 }
 
-// Interfaces para la cadena de evolución
 interface EvolutionSpecies {
   name: string;
   url: string;
@@ -115,17 +114,16 @@ interface EvolutionSpecies {
 
 interface EvolutionDetail {
   min_level: number | null;
-  // Añade más propiedades de evolución si las necesitas (item, trigger, etc.)
 }
 
 interface EvolvesTo {
   evolution_details: EvolutionDetail[];
-  evolves_to: EvolvesTo[]; // Recursivo para las siguientes etapas
+  evolves_to: EvolvesTo[];
   species: EvolutionSpecies;
 }
 
 interface EvolutionChainData {
-  baby_trigger_item: any; // o más específico si lo necesitas
+  baby_trigger_item: any;
   chain: {
     evolution_details: EvolutionDetail[];
     evolves_to: EvolvesTo[];
@@ -134,17 +132,15 @@ interface EvolutionChainData {
   id: number;
 }
 
-// Interfaz para los datos simplificados de la evolución para mostrar
 interface EvolutionStageDisplay {
   id: number;
   name: string;
   imageUrl: string | undefined;
 }
 
-// Interfaz para datos de ubicaciones
 interface PokemonLocationArea {
   location_area: {
-    name: string; // Este es el nombre original (ej: kanto-route-1)
+    name: string;
     url: string;
   };
   version_details: Array<{
@@ -157,16 +153,13 @@ interface PokemonLocationArea {
   }>;
 }
 
-// NUEVA INTERFAZ PARA ALMACENAR UBICACIONES
 interface FormattedLocation {
-  displayName: string; // Nombre para mostrar (ej: KANTO ROUTE 1)
-  apiName: string;     // Nombre para la API (ej: kanto-route-1)
+  displayName: string;
+  apiName: string;
 }
 
-
 type PokemonDetailScreenRouteProp = RouteProp<RootStackParamList, 'PokemonDetailScreen'>;
-// --- FIN DE DEFINICIONES DE TIPOS ---
-
+// --- END OF TYPE DEFINITIONS ---
 
 export default function PokemonDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -176,12 +169,11 @@ export default function PokemonDetailScreen() {
 
   const [pokemonData, setPokemonData] = useState<PokemonDetailCombinedData | null>(null);
   const [evolutionChain, setEvolutionChain] = useState<EvolutionStageDisplay[]>([]);
-  const [pokemonLocations, setPokemonLocations] = useState<FormattedLocation[]>([]); // CAMBIO: Ahora un array de FormattedLocation
+  const [pokemonLocations, setPokemonLocations] = useState<FormattedLocation[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'about' | 'stats' | 'moves' | 'evolutions' | 'loc'>('about');
 
-  // Función para obtener la cadena de evolución y sus detalles
   const fetchEvolutionChain = useCallback(async (evolutionChainUrl: string) => {
     try {
       const response = await axios.get<EvolutionChainData>(evolutionChainUrl);
@@ -189,7 +181,6 @@ export default function PokemonDetailScreen() {
 
       const evolutions: EvolutionStageDisplay[] = [];
 
-      // Función recursiva para parsear la cadena de evolución
       const parseChain = async (currentChain: EvolvesTo) => {
         const idMatch = currentChain.species.url.match(/\/(\d+)\/$/);
         const speciesId = idMatch ? parseInt(idMatch[1], 10) : null;
@@ -211,35 +202,34 @@ export default function PokemonDetailScreen() {
             evolutions.push({
               id: speciesId,
               name: currentChain.species.name,
-              imageUrl: undefined, // No image found
+              imageUrl: undefined,
             });
           }
         }
 
         for (const nextEvolution of currentChain.evolves_to) {
-          await parseChain(nextEvolution); // Llamada recursiva
+          await parseChain(nextEvolution);
         }
       };
 
       await parseChain(chain);
       setEvolutionChain(evolutions);
     } catch (err) {
-      console.error("🐛 [PokemonDetailScreen] Error al cargar la cadena de evolución:", err);
+      console.error("Error loading evolution chain:", err);
     }
   }, []);
 
-  // Función para obtener ubicaciones - CAMBIADA PARA ALMACENAR apiName y displayName
   const fetchPokemonLocations = useCallback(async (id: number) => {
     try {
       const response = await axios.get<PokemonLocationArea[]>(`https://pokeapi.co/api/v2/pokemon/${id}/encounters`);
       const locations = response.data.map(item => ({
-        displayName: item.location_area.name.replace(/-/g, ' ').toUpperCase(), // Para mostrar
-        apiName: item.location_area.name, // Para usar en la API
+        displayName: item.location_area.name.replace(/-/g, ' ').toUpperCase(),
+        apiName: item.location_area.name,
       }));
       setPokemonLocations(locations);
     } catch (err) {
-      console.error("🐛 [PokemonDetailScreen] Error al cargar las ubicaciones:", err);
-      setPokemonLocations([{ displayName: 'No se encontraron ubicaciones.', apiName: '' }]);
+      console.error("Error loading locations:", err);
+      setPokemonLocations([{ displayName: 'No locations found.', apiName: '' }]);
     }
   }, []);
 
@@ -249,8 +239,8 @@ export default function PokemonDetailScreen() {
     setError(null);
 
     if (typeof pokemonId === 'undefined' || pokemonId === null || typeof pokemonId !== 'number') {
-      console.error("🐛 [PokemonDetailScreen] fetchPokemonDetails: pokemonId es undefined o null. Cancelando fetch.");
-      setError("Error: El ID del Pokémon no es válido.");
+      console.error("fetchPokemonDetails: pokemonId is undefined, null, or not a number. Cancelling fetch.");
+      setError("Error: Invalid Pokémon ID.");
       setLoading(false);
       return;
     }
@@ -290,15 +280,13 @@ export default function PokemonDetailScreen() {
 
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(`Error al cargar los detalles del Pokémon: ${err.response?.statusText || err.message || "Error de red/servidor"}`);
-        console.error("🐛 [PokemonDetailScreen] Axios Error:", err.response?.status, err.response?.data || err.message, err.config?.url);
+        setError(`Error loading Pokémon details: ${err.response?.statusText || err.message || "Network/Server Error"}`);
       } else if (err instanceof Error) {
-        setError(`Ocurrió un error: ${err.message}.`);
-        console.error("🐛 [PokemonDetailScreen] General Error:", err.message);
+        setError(`An error occurred: ${err.message}.`);
       } else {
-        setError('Ocurrió un error desconocido al cargar los detalles del Pokémon.');
-        console.error("🐛 [PokemonDetailScreen] Unknown Error:", err);
+        setError('An unknown error occurred while loading Pokémon details.');
       }
+      console.error("Error fetching Pokémon details:", err);
     } finally {
       setLoading(false);
     }
@@ -309,7 +297,7 @@ export default function PokemonDetailScreen() {
     if (typeof pokemonId === 'number') {
       fetchPokemonDetails();
     } else {
-      setError("ID de Pokémon no proporcionado o inválido para la pantalla de detalles.");
+      setError("Pokemon ID not provided or invalid for detail screen.");
       setLoading(false);
     }
   }, [fetchPokemonDetails, pokemonId]);
@@ -317,20 +305,19 @@ export default function PokemonDetailScreen() {
   if (typeof pokemonId === 'undefined' || pokemonId === null || typeof pokemonId !== 'number') {
       return (
           <View style={[styles.fullScreenLoadingContainer, { paddingTop: insets.top + 20 }]}>
-              <Text style={styles.errorText}>Error: Pokémon ID no encontrado o inválido. Por favor, vuelve a la lista.</Text>
+              <Text style={styles.errorText}>Error: Pokémon ID not found or invalid. Please return to the list.</Text>
               <TouchableOpacity style={styles.backButton} onPress={() => goBack()}>
-                  <Text style={styles.backButtonText}>Volver</Text>
+                  <Text style={styles.backButtonText}>Go Back</Text>
               </TouchableOpacity>
           </View>
       );
   }
 
-
   if (loading) {
     return (
       <View style={[styles.fullScreenLoadingContainer, { paddingTop: insets.top + 20 }]}>
         <ActivityIndicator size="large" color="#E73B5B" />
-        <Text style={styles.loadingText}>Cargando detalles de {initialPokemonName || `Pokémon #${pokemonId}`}...</Text>
+        <Text style={styles.loadingText}>Loading details for {initialPokemonName || `Pokémon #${pokemonId}`}...</Text>
       </View>
     );
   }
@@ -338,10 +325,10 @@ export default function PokemonDetailScreen() {
   if (error) {
     return (
       <View style={[styles.fullScreenLoadingContainer, { paddingTop: insets.top + 20 }]}>
-        <Text style={styles.errorText}>¡Ups! Algo salió mal:</Text>
+        <Text style={styles.errorText}>Oops! Something went wrong:</Text>
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.backButton} onPress={() => goBack()}>
-          <Text style={styles.backButtonText}>Volver</Text>
+          <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -350,9 +337,9 @@ export default function PokemonDetailScreen() {
   if (!pokemonData) {
     return (
       <View style={[styles.fullScreenLoadingContainer, { paddingTop: insets.top + 20 }]}>
-        <Text style={styles.errorText}>No se encontraron datos completos para este Pokémon. Intenta de nuevo.</Text>
+        <Text style={styles.errorText}>No complete data found for this Pokémon. Please try again.</Text>
         <TouchableOpacity style={styles.backButton} onPress={() => goBack()}>
-          <Text style={styles.backButtonText}>Volver</Text>
+          <Text style={styles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -450,7 +437,7 @@ export default function PokemonDetailScreen() {
                 ))}
               </ScrollView>
             ) : (
-              <Text style={styles.subTextContent}>No se encontró información de evolución.</Text>
+              <Text style={styles.subTextContent}>No evolution information found.</Text>
             )}
           </View>
         );
@@ -471,7 +458,7 @@ export default function PokemonDetailScreen() {
                 ))}
               </ScrollView>
             ) : (
-              <Text style={styles.subTextContent}>No se encontraron ubicaciones para este Pokémon.</Text>
+              <Text style={styles.subTextContent}>No locations found for this Pokémon.</Text>
             )}
           </View>
         );
@@ -803,7 +790,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Inter-Regular',
   },
-  // --- ESTILOS PARA EVOLUCIONES ---
   evolutionContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -851,7 +837,6 @@ const styles = StyleSheet.create({
     transform: [{ translateY: -15 }],
     zIndex: 1,
   },
-  // --- ESTILOS PARA UBICACIONES ---
   locationsScrollView: {
     maxHeight: 250,
     paddingHorizontal: 10,

@@ -16,6 +16,8 @@ import {
 import axios from 'axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { navigate } from '../../navigation/RootNavigation';
+import CustomAlertDialog from '../../components/customAlertDialog/CustomAlertDialog';
+
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN_HORIZONTAL = 10;
@@ -25,7 +27,7 @@ const CONTAINER_HORIZONTAL_PADDING = 20;
 const CALCULATED_CARD_WIDTH =
   (width - (CONTAINER_HORIZONTAL_PADDING * 2) - (CARD_MARGIN_HORIZONTAL * (NUM_COLUMNS - 1))) / NUM_COLUMNS;
 
-// --- DEFINICIONES DE TIPOS (INTERFACES) ---
+// --- TYPE DEFINITIONS ---
 interface PokemonTypeSlot {
   slot: number;
   type: {
@@ -144,11 +146,16 @@ export default function Pokemon({ selectedType }: PokemonProps) {
   const [error, setError] = useState<string | null>(null);
   const [sortById, setSortById] = useState<boolean>(true);
 
+  // States for the recommended Pokémon modal
+  const [isRecommendedPokemonModalVisible, setIsRecommendedPokemonModalVisible] = useState(false);
+  const [recommendedPokemon, setRecommendedPokemon] = useState<{ name: string; id: number; imageUrl: string } | null>(null);
+
+
   const fetchAllPokemons = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
+      const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151'); // Fetch first 151 Pokemons
       const pokemonEntries = response.data.results;
 
       const pokemonDetailsPromises = pokemonEntries.map(async (entry: { name: string; url: string }) => {
@@ -168,15 +175,29 @@ export default function Pokemon({ selectedType }: PokemonProps) {
       let pokemonsWithDetails = await Promise.all(pokemonDetailsPromises);
       pokemonsWithDetails.sort((a, b) => a.id - b.id);
       setAllPokemons(pokemonsWithDetails);
+
+      // After successful load of all Pokemons, fetch and show recommendation
+      const randomId = Math.floor(Math.random() * 151) + 1; // Random ID for recommended Pokémon
+      const randomPokemonResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
+      const randomPokemon = randomPokemonResponse.data;
+      setRecommendedPokemon({
+        name: randomPokemon.name,
+        id: randomPokemon.id,
+        imageUrl: randomPokemon.sprites?.other?.['official-artwork']?.front_default ||
+                  randomPokemon.sprites?.front_default ||
+                  'https://placehold.co/96x96/E0E0E0/999999?text=No+Img',
+      });
+      setTimeout(() => setIsRecommendedPokemonModalVisible(true), 1500);
+
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(`Error al cargar la lista de Pokémon: ${err.response?.statusText || err.message}`);
+        setError(`Error loading Pokémon list: ${err.response?.statusText || err.message}`);
       } else if (err instanceof Error) {
-        setError(`Ocurrió un error: ${err.message}.`);
+        setError(`An error occurred: ${err.message}.`);
       } else {
-        setError('Ocurrió un error desconocido al cargar la lista de Pokémon.');
+        setError('An unknown error occurred while loading the Pokémon list.');
       }
-      console.error("Error fetching all Pokemons:", err);
+      console.error("Error fetching Pokemons:", err);
     } finally {
       setLoading(false);
     }
@@ -220,16 +241,11 @@ export default function Pokemon({ selectedType }: PokemonProps) {
       <TouchableOpacity
         style={styles.pokemonCardContainer}
         onPress={() => {
-          console.log("Pressed Pokemon:", item.name, "ID:", item.id, "Color:", item.primaryTypeColor);
-          if (item.id) {
-            navigate('PokemonDetailScreen', {
-                pokemonId: item.id,
-                primaryColor: item.primaryTypeColor || '#666666',
-                pokemonName: item.name,
-            });
-          } else {
-            console.warn("Cannot navigate: Pokemon ID is undefined for", item.name);
-          }
+          navigate('PokemonDetailScreen', {
+              pokemonId: item.id,
+              primaryColor: item.primaryTypeColor || '#666666',
+              pokemonName: item.name,
+          });
         }}
       >
         <View style={styles.pokemonCardContent}>
@@ -246,18 +262,19 @@ export default function Pokemon({ selectedType }: PokemonProps) {
       </TouchableOpacity>
     );
   }, []);
+
   if (loading) {
     return (
       <View style={[styles.centeredContent, { paddingTop: insets.top + 20 }]}>
         <ActivityIndicator size="large" color="#E73B5B" />
-        <Text style={styles.loadingText}>Cargando Pokémon...</Text>
+        <Text style={styles.loadingText}>Loading Pokémon...</Text>
       </View>
     );
   }
   if (error) {
     return (
       <View style={[styles.centeredContent, { paddingTop: insets.top + 20 }]}>
-        <Text style={styles.errorText}>¡Ups! Algo salió mal:</Text>
+        <Text style={styles.errorText}>Oops! Something went wrong:</Text>
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
@@ -286,7 +303,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
       </View>
       {filteredPokemons.length === 0 ? (
         <View style={styles.emptyListContent}>
-          <Text style={styles.subText}>No se encontraron Pokémon.</Text>
+          <Text style={styles.subText}>No Pokémon found.</Text>
         </View>
       ) : (
         <FlatList
@@ -303,6 +320,18 @@ export default function Pokemon({ selectedType }: PokemonProps) {
           showsVerticalScrollIndicator={false}
           bounces={false}
           alwaysBounceVertical={false}
+        />
+      )}
+
+      {/* Recommended Pokémon Modal */}
+      {recommendedPokemon && ( // Only render if a recommendation exists
+        <CustomAlertDialog
+          isVisible={isRecommendedPokemonModalVisible}
+          title="Pokémon Recommendation!"
+          message={`Today's recommended Pokémon is ${recommendedPokemon.name.toUpperCase()} (ID: #${String(recommendedPokemon.id).padStart(3, '0')})!`}
+          imageUrl={recommendedPokemon.imageUrl}
+          imageAltText={`Image of ${recommendedPokemon.name}`}
+          onClose={() => setIsRecommendedPokemonModalVisible(false)}
         />
       )}
     </View>

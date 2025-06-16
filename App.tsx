@@ -6,8 +6,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import Pokemon from './src/sections/pokemoninfo';
-import MenuScreen from './src/sections/menu';
-import PokemonListScreen from './src/sections/pokemonlist';
 import PokemonDetailScreen from './src/sections/pokemonDetailScreen/PokemonDetailScreen';
 
 
@@ -38,8 +36,6 @@ function App(): React.JSX.Element {
             }}
           >
             <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Menu" component={MenuScreen} />
-            <Stack.Screen name="PokemonListScreen" component={PokemonListScreen} options={{ title: 'Pokémon por Tipo' }} />
             <Stack.Screen name="PokemonDetailScreen" component={PokemonDetailScreen} />
             <Stack.Screen name="LocationDetailScreen" component={LocationDetailScreen} />
           </Stack.Navigator>
