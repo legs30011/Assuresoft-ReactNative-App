@@ -1,3 +1,5 @@
+// src/types/navigation.ts
+
 import { StackNavigationProp } from '@react-navigation/stack';
 
 export type RootStackParamList = {
@@ -5,6 +7,8 @@ export type RootStackParamList = {
   Menu: undefined;
   Profile: undefined;
   PokemonListScreen: { type: string };
+  PokemonDetailScreen: { pokemonId: number; primaryColor?: string; pokemonName?: string };
+  LocationDetailScreen: { locationName: string; };
 };
 
 declare global {
@@ -12,9 +16,7 @@ declare global {
     interface RootParamList extends RootStackParamList {}
   }
 }
-
-// Las propiedades de navegación para tus pantallas actuales
 export type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 export type MenuScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Menu'>;
 export type PokemonListScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PokemonListScreen'>;
-export type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profile'>;
+export type PokemonDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PokemonDetailScreen'>;

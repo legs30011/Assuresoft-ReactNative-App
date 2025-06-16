@@ -1,452 +1,472 @@
+/* eslint-disable quotes */
+/* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  StyleSheet,
-  Text,
   View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
   ActivityIndicator,
   Image,
   Dimensions,
   TextInput,
-  TouchableOpacity,
-  ImageBackground,
-  ScrollView,
+  Platform,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import Carousel from 'react-native-reanimated-carousel';
+import axios from 'axios';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { navigate } from '../../navigation/RootNavigation';
 
 const { width } = Dimensions.get('window');
+const CARD_MARGIN_HORIZONTAL = 10;
+const CARD_MARGIN_VERTICAL = 15;
+const NUM_COLUMNS = 3;
+const CONTAINER_HORIZONTAL_PADDING = 20;
+const CALCULATED_CARD_WIDTH =
+  (width - (CONTAINER_HORIZONTAL_PADDING * 2) - (CARD_MARGIN_HORIZONTAL * (NUM_COLUMNS - 1))) / NUM_COLUMNS;
 
-interface PokemonListItem {
-  name: string;
-  url: string;
-  imageUrl?: string;
+// --- DEFINICIONES DE TIPOS (INTERFACES) ---
+interface PokemonTypeSlot {
+  slot: number;
+  type: {
+    name: string;
+    url: string;
+  };
+}
+interface PokemonAbilitySlot {
+  ability: {
+    name: string;
+    url: string;
+  };
+  is_hidden: boolean;
+  slot: number;
 }
 
-interface PokemonData {
+interface PokemonSprites {
+  front_default: string | null;
+  other?: {
+    'official-artwork'?: {
+      front_default: string | null;
+    };
+  };
+}
+
+interface PokemonDetailData {
   id: number;
   name: string;
-  sprites: {
-    front_default: string;
-  };
-  types: Array<{
-    slot: number;
-    type: {
-      name: string;
-      url: string;
-    };
-  }>;
-  abilities: Array<{
-    ability: {
-      name: string;
-      url: string;
-    };
-    is_hidden: boolean;
-    slot: number;
-  }>;
   height: number;
   weight: number;
+  sprites: PokemonSprites;
+  types: PokemonTypeSlot[];
+  abilities: PokemonAbilitySlot[];
 }
-const PokemonCarouselItem = React.memo(({ item, onPress }: { item: PokemonListItem; onPress: (name: string) => void }) => (
-  <TouchableOpacity
-    style={styles.carouselItem}
-    onPress={() => onPress(item.name)}
-  >
-    {item.imageUrl ? (
-      <ImageBackground
-        source={{ uri: item.imageUrl }}
-        style={styles.carouselItemBackground}
-        imageStyle={styles.carouselItemImageStyle}
-      >
-        <View style={styles.carouselItemOverlay}>
-          <Text style={styles.carouselItemText}>{item.name.toUpperCase()}</Text>
-        </View>
-      </ImageBackground>
-    ) : (
-      <View style={styles.carouselItemNoImage}>
-        <Text style={styles.carouselItemText}>{item.name.toUpperCase()}</Text>
-        <Text style={styles.messageTextSmall}>Cargando imagen...</Text>
-      </View>
-    )}
-  </TouchableOpacity>
-));
+
+interface PokemonListItemDisplay extends PokemonDetailData {
+  imageUrl?: string;
+  primaryTypeColor?: string;
+}
+
+interface PokemonProps {
+  selectedType?: string;
+}
+const POKEMON_TYPE_COLORS: { [key: string]: string } = {
+  normal: '#A8A77A',
+  fire: '#FD7D24',
+  water: '#4592C4',
+  grass: '#9BCC50',
+  electric: '#F7D02C',
+  ice: '#51C4E7',
+  fighting: '#D56723',
+  poison: '#B97FC9',
+  ground: '#F7DE3F',
+  flying: '#3DC7EF',
+  psychic: '#F366B9',
+  bug: '#729F3F',
+  rock: '#A38C21',
+  ghost: '#7B62A3',
+  dragon: '#53A4CF',
+  steel: '#9EB7B8',
+  fairy: '#FDB9EA',
+  dark: '#707070',
+};
+
+const PokeBallIcon = ({ size = 24 }) => (
+  <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      borderWidth: size / 20,
+      borderColor: '#333',
+      backgroundColor: '#E73B5B',
+      overflow: 'hidden',
+    }}>
+      <View style={{
+        width: size,
+        height: size / 2,
+        backgroundColor: '#E73B5B',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+      }} />
+      <View style={{
+        width: size,
+        height: size / 2,
+        backgroundColor: '#FFFFFF',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+      }} />
+      <View style={{
+        width: size / 4,
+        height: size / 4,
+        borderRadius: size / 8,
+        backgroundColor: '#FFFFFF',
+        borderWidth: size / 20,
+        borderColor: '#333',
+        position: 'absolute',
+        alignSelf: 'center',
+        top: (size / 2) - (size / 8),
+        zIndex: 1,
+      }} />
+    </View>
+  </View>
+);
 
 
-const Pokemon = (): React.JSX.Element => {
-  const [allPokemons, setAllPokemons] = useState<PokemonListItem[]>([]);
-  const [filteredPokemons, setFilteredPokemons] = useState<PokemonListItem[]>([]);
-  const [selectedPokemon, setSelectedPokemon] = useState<PokemonData | null>(null);
+export default function Pokemon({ selectedType }: PokemonProps) {
+  const insets = useSafeAreaInsets();
+
+  const [allPokemons, setAllPokemons] = useState<PokemonListItemDisplay[]>([]);
+  const [filteredPokemons, setFilteredPokemons] = useState<PokemonListItemDisplay[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
+  const [sortById, setSortById] = useState<boolean>(true);
 
   const fetchAllPokemons = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
-      }
-      const data = await response.json();
-      const initialPokemons: PokemonListItem[] = data.results;
-      const pokemonDetailsPromises = initialPokemons.map(async (pokemon) => {
-        const detailResponse = await fetch(pokemon.url);
-        if (!detailResponse.ok) {
-          console.warn(`No se pudo cargar la imagen para ${pokemon.name}.`);
-          return { ...pokemon, imageUrl: undefined };
-        }
-        const detailData = await detailResponse.json();
-        return { ...pokemon, imageUrl: detailData.sprites?.front_default };
-      });
-      const pokemonsWithImages = await Promise.all(pokemonDetailsPromises);
+      const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
+      const pokemonEntries = response.data.results;
 
-      setAllPokemons(pokemonsWithImages);
-      setFilteredPokemons(pokemonsWithImages);
-    } catch (err: any) {
-      setError(err.message || 'Ocurrió un error desconocido al cargar los Pokémon.');
+      const pokemonDetailsPromises = pokemonEntries.map(async (entry: { name: string; url: string }) => {
+        const detailResponse = await axios.get<PokemonDetailData>(entry.url);
+        const primaryType = detailResponse.data.types[0]?.type.name.toLowerCase();
+        const primaryColor = primaryType ? POKEMON_TYPE_COLORS[primaryType] : '#666666';
+
+        return {
+          ...detailResponse.data,
+          imageUrl: detailResponse.data.sprites?.other?.['official-artwork']?.front_default ||
+                    detailResponse.data.sprites?.front_default ||
+                    undefined,
+          primaryTypeColor: primaryColor,
+        };
+      });
+
+      let pokemonsWithDetails = await Promise.all(pokemonDetailsPromises);
+      pokemonsWithDetails.sort((a, b) => a.id - b.id);
+      setAllPokemons(pokemonsWithDetails);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(`Error al cargar la lista de Pokémon: ${err.response?.statusText || err.message}`);
+      } else if (err instanceof Error) {
+        setError(`Ocurrió un error: ${err.message}.`);
+      } else {
+        setError('Ocurrió un error desconocido al cargar la lista de Pokémon.');
+      }
+      console.error("Error fetching all Pokemons:", err);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      setSelectedPokemon(null);
-      setSearchTerm('');
-      fetchAllPokemons();
-      return () => {};
-    }, [fetchAllPokemons])
-  );
+  useEffect(() => {
+    fetchAllPokemons();
+  }, [fetchAllPokemons]);
 
   useEffect(() => {
-    if (searchTerm === '') {
-      setFilteredPokemons(allPokemons);
-    } else {
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
-      const filtered = allPokemons.filter(pokemon =>
-        pokemon.name.toLowerCase().includes(lowerCaseSearchTerm)
+    let currentList = [...allPokemons];
+
+    if (selectedType && selectedType !== 'unknown') {
+      currentList = currentList.filter(pokemon =>
+        pokemon.types.some(typeSlot => typeSlot.type.name.toLowerCase() === selectedType.toLowerCase())
       );
-      setFilteredPokemons(filtered);
     }
-  }, [searchTerm, allPokemons]);
 
-  const fetchPokemonDetails = async (pokemonName: string) => {
-    setLoadingDetails(true);
-    setSelectedPokemon(null);
-    setError(null);
-    try {
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`);
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
-      }
-      const jsonData: PokemonData = await response.json();
-      setSelectedPokemon(jsonData);
-    } catch (err: any) {
-      setError(err.message || `Ocurrió un error al cargar los detalles de ${pokemonName}.`);
-    } finally {
-      setLoadingDetails(false);
+    if (searchTerm !== '') {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      currentList = currentList.filter(pokemon =>
+        pokemon.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+        String(pokemon.id).includes(lowerCaseSearchTerm)
+      );
     }
-  };
 
+    if (sortById) {
+      currentList.sort((a, b) => a.id - b.id);
+    } else {
+      currentList.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    setFilteredPokemons(currentList);
+  }, [searchTerm, allPokemons, selectedType, sortById]);
+
+
+  const renderPokemonCard = useCallback(({ item }: { item: PokemonListItemDisplay }) => {
+    const pokemonIdFormatted = item.id ? `#${String(item.id).padStart(3, '0')}` : '';
+
+    return (
+      <TouchableOpacity
+        style={styles.pokemonCardContainer}
+        onPress={() => {
+          console.log("Pressed Pokemon:", item.name, "ID:", item.id, "Color:", item.primaryTypeColor);
+          if (item.id) {
+            navigate('PokemonDetailScreen', {
+                pokemonId: item.id,
+                primaryColor: item.primaryTypeColor || '#666666',
+                pokemonName: item.name,
+            });
+          } else {
+            console.warn("Cannot navigate: Pokemon ID is undefined for", item.name);
+          }
+        }}
+      >
+        <View style={styles.pokemonCardContent}>
+          <Text style={styles.pokemonId}>{pokemonIdFormatted}</Text>
+          {item.imageUrl ? (
+            <Image source={{ uri: item.imageUrl }} style={styles.pokemonImage} />
+          ) : (
+            <View style={styles.pokemonImagePlaceholder}>
+              <Text style={styles.pokemonImagePlaceholderText}>No Image</Text>
+            </View>
+          )}
+          <Text style={styles.pokemonName}>{item.name.toUpperCase()}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  }, []);
   if (loading) {
     return (
-      <View style={styles.centeredContent}>
-        <ActivityIndicator size="large" color="#eeff00" />
-        <Text style={styles.messageText}>Cargando lista de Pokémon...</Text>
+      <View style={[styles.centeredContent, { paddingTop: insets.top + 20 }]}>
+        <ActivityIndicator size="large" color="#E73B5B" />
+        <Text style={styles.loadingText}>Cargando Pokémon...</Text>
       </View>
     );
   }
-
   if (error) {
     return (
-      <View style={styles.centeredContent}>
+      <View style={[styles.centeredContent, { paddingTop: insets.top + 20 }]}>
         <Text style={styles.errorText}>¡Ups! Algo salió mal:</Text>
         <Text style={styles.errorText}>{error}</Text>
-        <Text style={styles.messageText}>Intenta recargar la aplicación.</Text>
       </View>
     );
   }
-
   return (
-    <ImageBackground
-      source={require('../../assets/backgrounds/background1.jpg')}
-      style={styles.fullBackground}
-      resizeMode="cover"
-    >
-      <View style={styles.pokemonSectionContent}>
-        <Text style={styles.title}>Pokédex</Text>
+    <View style={styles.container}>
+      <View style={[styles.headerContainer, { paddingTop: insets.top + (Platform.OS === 'ios' ? 10 : 0) }]}>
+        <PokeBallIcon size={30} />
+        <Text style={styles.headerTitle}>Pokédex</Text>
+        <TouchableOpacity
+          style={styles.headerRightIcon}
+          onPress={() => setSortById(prev => !prev)}
+        >
+          <Text style={styles.headerRightIconText}>{sortById ? '#' : 'AZ'}</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.searchBarContainer}>
+        <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
-          style={styles.searchInput}
-          placeholder="Busca un Pokémon..."
-          placeholderTextColor="#C0C0C0"
+          style={styles.searchTextInput}
+          placeholder="Search"
+          placeholderTextColor="#666666"
           value={searchTerm}
           onChangeText={setSearchTerm}
         />
-
-        {loadingDetails ? (
-          <View style={styles.loadingDetailsContainer}>
-            <ActivityIndicator size="large" color="#eeff00" />
-            <Text style={styles.messageText}>Cargando detalles...</Text>
-          </View>
-        ) : selectedPokemon ? (
-          <ScrollView contentContainerStyle={styles.pokemonCardScrollViewContent}>
-            <View style={styles.pokemonCard}>
-              <Text style={styles.pokemonName}>{selectedPokemon.name.toUpperCase()}</Text>
-              {selectedPokemon.sprites?.front_default ? (
-                <Image
-                  source={{ uri: selectedPokemon.sprites.front_default }}
-                  style={styles.pokemonImageDetail}
-                  onError={(e) => console.log('Error al cargar la imagen:', e.nativeEvent.error)}
-                />
-              ) : (
-                <Text style={styles.messageText}>No se encontró la imagen.</Text>
-              )}
-
-              <Text style={styles.detailText}>
-                ID: {selectedPokemon.id}
-              </Text>
-              <Text style={styles.detailText}>
-                Tipo(s): {selectedPokemon.types.map(t => t.type.name).join(', ')}
-              </Text>
-              <Text style={styles.detailText}>
-                Altura: {selectedPokemon.height / 10} m
-              </Text>
-              <Text style={styles.detailText}>
-                Peso: {selectedPokemon.weight / 10} kg
-              </Text>
-              <Text style={styles.detailText}>
-                Habilidades: {selectedPokemon.abilities.map(a => a.ability.name).join(', ')}
-              </Text>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => setSelectedPokemon(null)}
-              >
-                <Text style={styles.backButtonText}>Volver a la lista</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        ) : (
-          <Carousel
-            loop
-            width={width * 0.9}
-            height={400}
-            autoPlay={false}
-            data={filteredPokemons}
-            scrollAnimationDuration={1000}
-            onSnapToItem={(index) => console.log('current index:', index)}
-            renderItem={({ item }) => (
-              <PokemonCarouselItem item={item} onPress={fetchPokemonDetails} />
-            )}
-            mode="parallax"
-            modeConfig={{
-              parallaxScrollingScale: 0.9,
-              parallaxScrollingOffset: 40,
-              parallaxAdjacentItemScale: 0.85,
-            }}
-            style={styles.carouselContainer}
-          />
-        )}
       </View>
-    </ImageBackground>
+      {filteredPokemons.length === 0 ? (
+        <View style={styles.emptyListContent}>
+          <Text style={styles.subText}>No se encontraron Pokémon.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredPokemons}
+          keyExtractor={(item) => String(item.id)}
+          numColumns={NUM_COLUMNS}
+          columnWrapperStyle={styles.columnWrapper}
+          contentContainerStyle={styles.pokemonListContent}
+          renderItem={renderPokemonCard}
+          initialNumToRender={10}
+          maxToRenderPerBatch={5}
+          windowSize={10}
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          alwaysBounceVertical={false}
+        />
+      )}
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  fullBackground: {
+  container: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    backgroundColor: '#000000',
   },
-  pokemonSectionContent: {
-    flex: 1,
-    width: '100%',
+  headerContainer: {
+    backgroundColor: '#FF0000',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: CONTAINER_HORIZONTAL_PADDING,
     paddingBottom: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingTop: 10,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    height: Platform.OS === 'ios' ? 120 : 100,
   },
-  title: {
-    fontSize: 38,
+  headerTitle: {
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#eeff00',
-    marginBottom: 5,
-    textShadowColor: 'rgba(0, 0, 0, 0.6)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-    marginTop: 10,
+    color: '#FFFFFF',
+    marginLeft: 10,
+    flex: 1,
   },
-  searchInput: {
-    width: '90%',
-    height: 50,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    borderRadius: 25,
-    paddingHorizontal: 20,
-    marginBottom: 5,
-    fontSize: 18,
-    borderWidth: 1,
-    borderColor: '#eeff00',
+  headerRightIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  headerRightIconText: {
+    fontSize: 24,
+    color: '#E73B5B',
+    fontWeight: 'bold',
+  },
+  searchBarContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 90 : 70,
+    left: CONTAINER_HORIZONTAL_PADDING,
+    right: CONTAINER_HORIZONTAL_PADDING,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
     elevation: 8,
-    color: '#ffffff',
+    zIndex: 1,
   },
-  carouselContainer: {
-    width: width,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexGrow: 1,
-    marginTop: 0,
-  },
-  carouselItem: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    width: width * 0.78,
-    height: 200,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 15,
-    borderWidth: 2,
-    borderColor: '#eeff00',
-    marginHorizontal: 10,
-  },
-  carouselItemBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  carouselItemImageStyle: {
-    opacity: 0.25,
-    resizeMode: 'cover',
-  },
-  carouselItemOverlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    flex: 1,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-  },
-  carouselItemText: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#eeff00',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-    textAlign: 'center',
-  },
-  carouselItemNoImage: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    padding: 10,
-  },
-  messageTextSmall: {
-    fontSize: 14,
-    color: '#D3D3D3',
-    marginTop: 5,
-  },
-  pokemonCardScrollViewContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    paddingBottom: 20,
-  },
-  pokemonCard: {
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    borderRadius: 20,
-    marginHorizontal: 20,
-    padding: 25,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 15,
-    width: '90%',
-    maxWidth: 380,
-    borderWidth: 2,
-    borderColor: '#eeff00',
-  },
-  pokemonName: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#eeff00',
-    marginBottom: 10,
-    textTransform: 'capitalize',
-    textShadowColor: 'rgba(0, 0, 0, 0.4)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-  },
-  pokemonImageDetail: {
-    width: width * 0.55,
-    height: width * 0.55,
-    resizeMode: 'contain',
-    marginBottom: 20,
-    backgroundColor: 'rgba(240, 240, 240, 0.2)',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#eeff00',
-  },
-  detailText: {
-    fontSize: 18,
-    color: '#ffffff',
-    marginBottom: 8,
-    textAlign: 'center',
-    lineHeight: 25,
-  },
-  messageText: {
-    fontSize: 18,
-    color: '#D3D3D3',
-    marginTop: 15,
-    textAlign: 'center',
-  },
-  errorText: {
+  searchIcon: {
     fontSize: 20,
-    color: '#e74c3c',
-    textAlign: 'center',
-    marginBottom: 15,
-    fontWeight: '500',
+    color: '#666666',
+    marginRight: 10,
+  },
+  searchTextInput: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+    color: '#333333',
   },
   centeredContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
   },
-  loadingDetailsContainer: {
+  emptyListContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 200,
+    paddingBottom: 50,
   },
-  backButton: {
-    marginTop: 25,
-    backgroundColor: '#eeff00',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 10,
-  },
-  backButtonText: {
-    color: '#000000',
+  loadingText: {
+    color: '#ff0000',
     fontSize: 18,
+    marginTop: 10,
+  },
+  errorText: {
+    color: '#FF0000',
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  subText: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  pokemonListContent: {
+    paddingTop: 80,
+    paddingBottom: 20,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
+    marginBottom: CARD_MARGIN_VERTICAL,
+  },
+  pokemonCardContainer: {
+    width: CALCULATED_CARD_WIDTH,
+    height: CALCULATED_CARD_WIDTH * 1.25,
+    borderRadius: 10,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: CARD_MARGIN_HORIZONTAL / 2,
+  },
+  pokemonCardContent: {
+    flex: 1,
+    padding: 8,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  pokemonId: {
+    position: 'absolute',
+    top: 5,
+    right: 8,
+    fontSize: 12,
     fontWeight: 'bold',
+    color: '#666666',
+  },
+  pokemonImage: {
+    width: '80%',
+    height: '55%',
+    resizeMode: 'contain',
+    marginTop: 15,
+  },
+  pokemonImagePlaceholder: {
+    width: '80%',
+    height: '55%',
+    backgroundColor: '#E0E0E0',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  pokemonImagePlaceholderText: {
+    color: '#999999',
+    fontSize: 12,
+  },
+  pokemonName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333333',
+    textAlign: 'center',
+    marginTop: 'auto',
+    marginBottom: 5,
   },
 });
-
-export default Pokemon;
