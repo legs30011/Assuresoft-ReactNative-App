@@ -155,7 +155,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151'); // Fetch first 151 Pokemons
+      const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
       const pokemonEntries = response.data.results;
 
       const pokemonDetailsPromises = pokemonEntries.map(async (entry: { name: string; url: string }) => {
