@@ -73,5 +73,4 @@ npm install react-native-gesture-handler react-native-reanimated react-native-re
 
 
 npx react-native start --reset-cache
-
  npx react-native run-ios   
