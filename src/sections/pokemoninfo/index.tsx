@@ -155,7 +155,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151'); // Fetch first 151 Pokemons
+      const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
       const pokemonEntries = response.data.results;
 
       const pokemonDetailsPromises = pokemonEntries.map(async (entry: { name: string; url: string }) => {
@@ -176,8 +176,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
       pokemonsWithDetails.sort((a, b) => a.id - b.id);
       setAllPokemons(pokemonsWithDetails);
 
-      // After successful load of all Pokemons, fetch and show recommendation
-      const randomId = Math.floor(Math.random() * 151) + 1; // Random ID for recommended Pokémon
+      const randomId = Math.floor(Math.random() * 151) + 1; 
       const randomPokemonResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
       const randomPokemon = randomPokemonResponse.data;
       setRecommendedPokemon({
@@ -322,9 +321,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
           alwaysBounceVertical={false}
         />
       )}
-
-      {/* Recommended Pokémon Modal */}
-      {recommendedPokemon && ( // Only render if a recommendation exists
+      {recommendedPokemon && ( 
         <CustomAlertDialog
           isVisible={isRecommendedPokemonModalVisible}
           title="Pokémon Recommendation!"

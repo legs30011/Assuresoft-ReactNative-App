@@ -1,76 +1,190 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+AssureDex React Native Pokémon App
+Welcome to AssureDex, a React Native application designed to provide a comprehensive guide to the Pokémon universe. This app aims to be a functional Pokédex, along with sections for Moves, Abilities, Items, Parties, Locations, Natures, and Type Charts.
 
-# Getting Started
+Table of Contents
+Features
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+Prerequisites
 
-## Step 1: Start Metro
+Installation
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+Running the App
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+Project Structure
 
-```sh
-# Using npm
-npm start
+Dependencies
 
-# OR using Yarn
-yarn start
-```
+Troubleshooting
 
-## Step 2: Build and run your app
+Features
+Pokédex: Browse and search for Pokémon.
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Moves: Explore various Pokémon moves.
 
-### Android
+Abilities: Learn about different Pokémon abilities.
 
-```sh
-# Using npm
-npm run android
+Items: Discover items in the Pokémon world.
 
-# OR using Yarn
-yarn android
-```
+Parties: (Coming Soon) Manage your Pokémon teams.
 
-### iOS
+Locations: (Coming Soon) Explore different regions and places.
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+Natures: Understand the effects of Pokémon natures.
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+Type Chart: A detailed guide on Pokémon type effectiveness.
 
-```sh
-bundle install
-```
+Clean User Interface: A modern and intuitive design with gradients and custom icons.
 
-Then, and every time you update your native dependencies, run:
+Prerequisites
+Before you begin, ensure you have the following installed:
 
-```sh
-bundle exec pod install
-```
+Node.js (>=18): Download Node.js
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+npm (comes with Node.js) or Yarn
 
-```sh
-# Using npm
-npm run ios
+React Native CLI:
 
-# OR using Yarn
-yarn ios
-```
+npm install -g react-native-cli
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+Xcode (for iOS development): Install from the Mac App Store. Ensure Command Line Tools are installed (xcode-select --install).
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+CocoaPods (for iOS native dependencies):
 
-## run app
-npx react-native run-ios
+sudo gem install cocoapods
 
-## instalations
-npm install react-native-reanimated react-native-gesture-handler react-native-reanimated-carousel
+Installation
+Follow these steps to set up the project locally:
 
-npm install react-native-reanimated react-native-gesture-handler react-native-reanimated-carousel @react-navigation/native @react-navigation/stack
-npm install react-native-gesture-handler react-native-reanimated react-native-reanimated-carousel
+Clone the repository:
 
+git clone https://github.com/legs30011/Assuresoft-ReactNative-App.git
+cd Assuresoft-ReactNative-App
+
+Install JavaScript dependencies:
+This command will install all packages listed in your package.json.
+
+npm install
+# OR if using Yarn:
+# yarn install
+
+Install iOS native dependencies (CocoaPods):
+
+cd ios
+pod install
+cd ..
+
+Configure react-native-vector-icons (Crucial for Icons):
+This library requires linking its font files to your native iOS project.
+
+a.  Create/Verify react-native.config.js:
+In the root directory of your project (where package.json is located), ensure you have a file named react-native.config.js with the following content:
+javascript module.exports = { assets: ['./node_modules/react-native-vector-icons/Fonts/'], }; 
+
+b.  Run Autolinking:
+From the root directory of your project, run:
+bash npx react-native link 
+
+c.  Manual iOS Linking Steps in Xcode (Highly Recommended if icons don't appear):
+Even with autolinking, sometimes manual steps are needed for iOS.
+
+i.  Open your project in Xcode. Navigate to `ios/YourProjectName.xcworkspace`.
+ii. In the Project Navigator (left pane), right-click on your project's main folder (e.g., `AssureDex`) and select `Add Files to "AssureDex..."`.
+iii. Navigate to `node_modules/react-native-vector-icons/Fonts/` and select **all `.ttf` font files** (e.g., `MaterialCommunityIcons.ttf`, `FontAwesome5_Solid.ttf`, etc., depending on which icon sets you use). Click "Add". Ensure "Copy items if needed" is checked.
+iv. Select your project target (usually named `AssureDex`) in the Xcode sidebar. Go to `Build Phases` -> `Copy Bundle Resources`. Verify that all the `.ttf` files you just added are listed here. If not, add them.
+v.  Go to the `Info` tab (or open `Info.plist`). Add a new row to `Information Property List`. The key should be `UIAppFonts` (or select "Fonts provided by application"). This will create an array.
+vi. For each `.ttf` file, add an item to this array with its **exact filename** (e.g., `MaterialCommunityIcons.ttf`).
+vii. In Xcode, clean the build folder (`Product` > `Clean Build Folder`) and then build (`Product` > `Build`).
+
+Running the App
+After installation and linking, you can run the app:
+
+Start the Metro Bundler:
+This command starts the development server. Use --reset-cache to clear any old caches, which is useful after dependency changes.
 
 npx react-native start --reset-cache
- npx react-native run-ios   
+
+Run on iOS Simulator/Device:
+Open a new terminal window (keep the Metro Bundler running in the first one) and run:
+
+npx react-native run-ios
+
+Project Structure
+The project follows a standard React Native structure:
+
+src/
+├── assets/                  # Static assets like images (icons, backgrounds, trainers)
+│   ├── backgrounds/
+│   ├── icons/
+│   └── trainers/
+├── components/              # Reusable UI components (e.g., CustomAlertDialog)
+├── navigation/              # Navigation setup and utilities (e.g., RootNavigation.ts)
+├── sections/                # Contains individual app screens/features
+│   ├── abilities/           # AbilitiesScreen.tsx
+│   ├── common/              # Common screens like ComingSoonScreen
+│   ├── homeScreen/          # HomeScreen.tsx (your main screen)
+│   ├── items/               # ItemsScreen.tsx
+│   ├── locationDetailScreen/
+│   ├── moves/               # MovesScreen.tsx
+│   ├── natures/             # NaturesScreen.tsx
+│   ├── pokemonDetailScreen/
+│   ├── pokemoninfo/
+│   └── typeChart/           # TypeChartScreen.tsx
+└── types/                   # TypeScript type definitions (e.g., navigation.d.ts)
+
+Dependencies
+Key dependencies used in this project (as per package.json):
+
+@react-navigation/native
+
+@react-navigation/native-stack
+
+@react-navigation/stack
+
+axios
+
+react
+
+react-native
+
+react-native-gesture-handler
+
+react-native-linear-gradient
+
+react-native-progress
+
+react-native-reanimated
+
+react-native-reanimated-carousel
+
+react-native-safe-area-context
+
+react-native-screens
+
+react-native-vector-icons
+
+react-native-svg (if you were using SVG images directly)
+
+Troubleshooting
+"Error: Text string must be rendered within a <Text> component":
+This means you have plain text directly in a <View> or other component that isn't a <Text> component. Wrap all text content in <Text>.
+
+Icons showing as ? or squares:
+This is the most common issue with react-native-vector-icons and indicates that the font files are not correctly linked to your native project. Carefully re-check all steps in the "Configure react-native-vector-icons" section above, especially the manual steps for iOS in Xcode. A clean build folder (Product > Clean Build Folder in Xcode) and a fresh pod install (cd ios && pod install) are often required.
+
+"Invariant Violation: requireNativeComponent: 'RNCWebView' was not found" / Similar native module errors:
+Often fixed by re-running npm install, cd ios && pod install, and then npx react-native start --reset-cache. Ensure your npx react-native link step was successful if manual linking is not applicable for a specific library.
+
+Build failures after npm install or pod install:
+Try cleaning your project:
+
+iOS: In Xcode, Product > Clean Build Folder. Then, cd ios && pod install && cd ...
+
+General: Delete node_modules and Podfile.lock (if on iOS), clear caches, and reinstall:
+
+rm -rf node_modules
+rm -rf $TMPDIR/metro-*
+rm -rf $TMPDIR/haste-map-*
+npm cache clean --force
+watchman watch-del-all
+npm install
+cd ios && rm Podfile.lock && pod install && cd .. # For iOS
