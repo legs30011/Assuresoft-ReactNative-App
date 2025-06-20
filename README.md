@@ -325,34 +325,6 @@ src/
 │   └── typeChart/           # TypeChartScreen.tsx
 └── types/                   # TypeScript type definitions (e.g., navigation.d.ts)
 
-Visuals (Adding Images to README)
-You can easily embed images in your README.md file using Markdown syntax. This is great for showcasing screenshots of your app!
-
-Image Syntax
-To embed an image, use the following format:
-
-![Alt text for the image](URL_del_imagen "Título opcional del imagen")
-
-Alt text for the image: This is important for accessibility. It describes the image if it cannot be displayed (e.g., slow internet, screen reader). Make it descriptive!
-
-URL_del_imagen: This is the direct link to your image. This can be:
-
-A URL to an image hosted online (e.g., https://example.com/screenshot.png). This is the most common and reliable method for GitHub README files.
-
-A relative path to an image within your GitHub repository (e.g., ./screenshots/home.png). This works well if you store your screenshots directly in your repo.
-
-"Título opcional del imagen": (Optional) This text appears when a user hovers over the image.
-
-Examples
-Here's how you might add a screenshot of your home screen:
-
-![Screenshot of the AssureDex Home Screen](https://placehold.co/600x400/E73B5B/FFFFFF?text=HOME+SCREEN+HERE "AssureDex Home Screen")
-
-Result:
-
-
-You can add more images to illustrate different features or screens. Remember to replace the placeholder URL with your actual image URLs.
-
 Dependencies
 Key dependencies used in this project (as per package.json):
 
