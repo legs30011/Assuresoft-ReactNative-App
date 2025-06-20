@@ -157,9 +157,7 @@ interface FormattedLocation {
   displayName: string;
   apiName: string;
 }
-
 type PokemonDetailScreenRouteProp = RouteProp<RootStackParamList, 'PokemonDetailScreen'>;
-// --- END OF TYPE DEFINITIONS ---
 
 export default function PokemonDetailScreen() {
   const insets = useSafeAreaInsets();

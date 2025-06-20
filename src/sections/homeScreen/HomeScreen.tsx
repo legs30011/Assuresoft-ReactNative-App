@@ -7,75 +7,65 @@ import {
   Dimensions,
   ScrollView,
   Platform,
-  Image,
   ImageBackground,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { navigate } from '../../navigation/RootNavigation';
 import { RootStackParamList } from '../../types/navigation';
 import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
 
-const POKEDEX_ICON = 'https://placehold.co/100x100/E73B5B/FFFFFF?text=P';
-const MOVES_ICON = 'https://placehold.co/100x100/F7D02C/000000?text=M';
-const ABILITIES_ICON = 'https://placehold.co/100x100/B97FC9/FFFFFF?text=A';
-const ITEMS_ICON = 'https://placehold.co/100x100/9EB7B8/000000?text=I';
-const PARTIES_ICON = 'https://placehold.co/100x100/4592C4/FFFFFF?text=P';
-const LOCATIONS_ICON = 'https://placehold.co/100x100/9BCC50/FFFFFF?text=L';
-const NATURES_ICON = 'https://placehold.co/100x100/D56723/FFFFFF?text=N';
-const TYPE_CHART_ICON = 'https://placehold.co/100x100/707070/FFFFFF?text=T';
-
-const BACKGROUND_PATTERN_SVG_CONTENT = '<svg width="100%" height="100%" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M9 2.5L8.5 3.1C7.7 4.8 6.3 7.5 6.8 8.2 7.5 8.7 9 6.8 9.6 6.6L10.2 5.6L9 2.5zM6 0.5L6 2.5 7 3.5 6.5 4.4 5 5 5 7.5 5 8.5 5.6 9.6 6.4 10.2 6.6 10.2 5.6 9.6 6.6 7.7 4.8 6.3 7.5 6.8 8.2 7.5 8.7 9 6.8 9.6 6.6 10.2 5.6 9 2.5 8.5 3.1 7.7 4.8 6.3 7.5 6.8 8.2 7.5 8.7 9 6.8 9.6 6.6 10.2 5.6 9 2.5 z" fill="#333333" opacity="0.08"/></svg>';
-const BACKGROUND_PATTERN = `data:image/svg+xml;base64,${btoa(BACKGROUND_PATTERN_SVG_CONTENT)}`;
+const BACKGROUND_PATTERN = 'https://placehold.co/10x10/333333/333333?text=+&font=arial&opacity=10';
 
 const menuItems = [
   {
     name: 'Pokédex',
-    icon: POKEDEX_ICON,
+    iconName: 'aim',
     screen: 'PokemonListScreen',
     colors: ['#E73B5B', '#C2002E'],
   },
   {
     name: 'Moves',
-    icon: MOVES_ICON,
+    iconName: 'sword-cross',
     screen: 'MovesScreen',
     colors: ['#F7D02C', '#F3A800'],
   },
   {
     name: 'Abilities',
-    icon: ABILITIES_ICON,
+    iconName: 'lightning-bolt',
     screen: 'AbilitiesScreen',
     colors: ['#B97FC9', '#905A9C'],
   },
   {
     name: 'Items',
-    icon: ITEMS_ICON,
+    iconName: 'bag-personal',
     screen: 'ItemsScreen',
     colors: ['#9EB7B8', '#7E9C9E'],
   },
   {
     name: 'Parties',
-    icon: PARTIES_ICON,
+    iconName: 'account-group',
     screen: 'ComingSoonScreen',
     colors: ['#4592C4', '#2C6D9E'],
   },
   {
     name: 'Locations',
-    icon: LOCATIONS_ICON,
+    iconName: 'map-marker',
     screen: 'LocationDetailScreen',
     params: { locationName: 'pallet-town' },
     colors: ['#9BCC50', '#7AA040'],
   },
   {
     name: 'Natures',
-    icon: NATURES_ICON,
+    iconName: 'leaf',
     screen: 'NaturesScreen',
     colors: ['#D56723', '#A84C1C'],
   },
   {
     name: 'Type Chart',
-    icon: TYPE_CHART_ICON,
+    iconName: 'chart-bar',
     screen: 'TypeChartScreen',
     colors: ['#707070', '#4A4A4A'],
   },
@@ -119,7 +109,7 @@ export default function HomeScreen() {
                     end={{ x: 1, y: 1 }}
                     style={styles.menuCardGradient}
                   >
-                    <Image source={{ uri: item.icon }} style={styles.menuIcon} />
+                    <Icon name={item.iconName} size={60} color="#ffffff" style={styles.menuIcon} />
                     <Text style={styles.menuText}>{item.name}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -204,9 +194,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   menuIcon: {
-    width: '60%',
-    height: '60%',
-    resizeMode: 'contain',
     marginBottom: 5,
   },
   menuText: {
