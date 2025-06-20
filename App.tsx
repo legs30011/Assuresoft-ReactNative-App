@@ -25,13 +25,13 @@ function App(): React.JSX.Element {
       <SafeAreaView style={styles.safeArea}>
         <NavigationContainer ref={navigationRef}>
           <Stack.Navigator
-            initialRouteName="Home"
+            initialRouteName="HomeScreen"
             screenOptions={{
               headerShown: false,
               cardStyle: { backgroundColor: '#000000' },
             }}
           >
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="HomeScreen" component={HomeScreen} />
             <Stack.Screen name="PokemonListScreen" component={PokemonInfoScreen} />
             <Stack.Screen name="PokemonDetailScreen" component={PokemonDetailScreen} />
             <Stack.Screen name="LocationDetailScreen" component={LocationDetailScreen} />

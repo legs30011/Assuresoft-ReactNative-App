@@ -17,7 +17,7 @@ import axios from 'axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { navigate } from '../../navigation/RootNavigation';
 import CustomAlertDialog from '../../components/customAlertDialog/CustomAlertDialog';
-
+import Footer from '../../sections/footer/Footer';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN_HORIZONTAL = 10;
@@ -68,7 +68,7 @@ interface PokemonListItemDisplay extends PokemonDetailData {
   primaryTypeColor?: string;
 }
 
-interface PokemonProps {
+interface PokemonListScreenProps { // Renamed from PokemonProps for clarity
   selectedType?: string;
 }
 const POKEMON_TYPE_COLORS: { [key: string]: string } = {
@@ -92,6 +92,7 @@ const POKEMON_TYPE_COLORS: { [key: string]: string } = {
   dark: '#707070',
 };
 
+// PokeBallIcon (assuming this is used in the header for this screen)
 const PokeBallIcon = ({ size = 24 }) => (
   <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
     <View style={{
@@ -136,7 +137,7 @@ const PokeBallIcon = ({ size = 24 }) => (
 );
 
 
-export default function Pokemon({ selectedType }: PokemonProps) {
+export default function PokemonListScreen({ selectedType }: PokemonListScreenProps) {
   const insets = useSafeAreaInsets();
 
   const [allPokemons, setAllPokemons] = useState<PokemonListItemDisplay[]>([]);
@@ -176,7 +177,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
       pokemonsWithDetails.sort((a, b) => a.id - b.id);
       setAllPokemons(pokemonsWithDetails);
 
-      const randomId = Math.floor(Math.random() * 151) + 1; 
+      const randomId = Math.floor(Math.random() * 151) + 1;
       const randomPokemonResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
       const randomPokemon = randomPokemonResponse.data;
       setRecommendedPokemon({
@@ -310,7 +311,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
           keyExtractor={(item) => String(item.id)}
           numColumns={NUM_COLUMNS}
           columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={styles.pokemonListContent}
+          contentContainerStyle={styles.pokemonListContent} // Adjusted paddingBottom here
           renderItem={renderPokemonCard}
           initialNumToRender={10}
           maxToRenderPerBatch={5}
@@ -321,7 +322,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
           alwaysBounceVertical={false}
         />
       )}
-      {recommendedPokemon && ( 
+      {recommendedPokemon && (
         <CustomAlertDialog
           isVisible={isRecommendedPokemonModalVisible}
           title="Pokémon Recommendation!"
@@ -331,6 +332,7 @@ export default function Pokemon({ selectedType }: PokemonProps) {
           onClose={() => setIsRecommendedPokemonModalVisible(false)}
         />
       )}
+      <Footer /> 
     </View>
   );
 }
@@ -435,7 +437,7 @@ const styles = StyleSheet.create({
   },
   pokemonListContent: {
     paddingTop: 80,
-    paddingBottom: 20,
+    paddingBottom: 100, // <--- AJUSTADO para hacer espacio al Footer (aprox. 70px de altura del Footer + insets)
   },
   columnWrapper: {
     justifyContent: 'space-between',
