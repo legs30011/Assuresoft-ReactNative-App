@@ -185,10 +185,7 @@ AssureDex/
 
 
 ## Visuals
-```markdown
 Examples
-Here are the direct displays of your screenshots. These paths assume your README.md file is located at the root of your repository and your images are in src/assets/screenShots/ relative to that root.
-
 Home Screen:
 ![Alt text for the image](src/assets/screenShots/1s.png "Home Screen:")
 Pokédex Start (List View):
