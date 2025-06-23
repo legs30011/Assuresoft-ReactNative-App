@@ -187,15 +187,15 @@ AssureDex/
 ## Visuals
 Examples
 Home Screen:
-![Alt text for the image](src/assets/screenShots/1s.png "Home Screen:")
+<img src="src/assets/screenShots/1s.png" width="48">
 Pokédex Start (List View):
-![Alt text for the image](src/assets/screenShots/2s.png "Pokédex Start (List View):")
+<img src="src/assets/screenShots/2s.png" width="48">
 Pokémon Detail Information:
-![Alt text for the image](src/assets/screenShots/3s.png "Pokémon Detail Information:")
+<img src="src/assets/screenShots/3s.png" width="48">
 Search by Number:
-![Alt text for the image](src/assets/screenShots/4s.png "Search by Number:")
+<img src="src/assets/screenShots/4s.png" width="48">
 Search by Word (Name):
-![Alt text for the image](src/assets/screenShots/5s.png "Search by Word (Name):")
+<img src="src/assets/screenShots/5s.png" width="48">
 
 Dependencies
 Key dependencies utilized in this project (as per package.json):
