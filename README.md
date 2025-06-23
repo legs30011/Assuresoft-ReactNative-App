@@ -1,440 +1,292 @@
-AssureDex React Native Pokémon App
-Welcome to AssureDex, a React Native application designed to provide a comprehensive guide to the Pokémon universe. This app aims to be a functional Pokédex, along with sections for Moves, Abilities, Items, Parties, Locations, Natures, and Type Charts.
+# AssureDex: A Comprehensive React Native Pokémon Guide
 
-Table of Contents
-Features
+Welcome to **AssureDex**, a robust and feature-rich React Native application designed to serve as your ultimate companion in the Pokémon universe. This app provides a modern and intuitive interface to explore various aspects of the Pokémon world, from detailed creature data to move sets, abilities, and locations.
 
-Prerequisites
+## Table of Contents
 
-Installation
+* [Features](#features)
+* [Prerequisites](#prerequisites)
+* [Installation](#installation)
+* [Running the App](#running-the-app)
+* [Project Structure](#project-structure)
+* [Visuals](#visuals)
+* [Dependencies](#dependencies)
+* [Troubleshooting](#troubleshooting)
 
-Running the App
+---
 
-Project Structure
+## Features
 
-Visuals (Adding Images to README)
+AssureDex offers a range of functionalities to enhance your Pokémon journey:
+
+* **Pokédex:** Comprehensive browsing and search capabilities for Pokémon, including detailed information such as IDs, types, and images.
+* **Moves:** An extensive database to explore various Pokémon moves.
+* **Abilities:** Detailed insights into different Pokémon abilities.
+* **Items:** A catalog of items found within the Pokémon world.
+* **Evolution Lines:** Dedicated section to understand Pokémon evolution paths.
+* **Locations:** (Coming Soon) A guide to various regions and significant places.
+* **Natures:** Information on how different natures affect Pokémon stats.
+* **Type Chart:** A detailed reference for Pokémon type effectiveness.
+* **Universal Search:** A powerful search bar allowing queries across multiple categories (Pokémon, Moves, Abilities, Items).
+* **Clean User Interface:** Features a modern and intuitive design with vibrant gradients, custom icons, and fluid animations powered by `react-native-reanimated`.
+* **Persistent Bottom Navigation:** A reusable footer component for consistent navigation across key sections (Home, Notifications, User Profile).
+
+## Prerequisites
+
+Before setting up the project, ensure your development environment meets the following requirements:
+
+* **Node.js (LTS version, >=18):** Download from [Node.js official website](https://nodejs.org/).
+* **npm** (comes with Node.js) or **Yarn**.
+* **React Native CLI:**
+    ```bash
+    npm install -g react-native-cli
+    # OR if using Yarn:
+    # yarn global add react-native-cli
+    ```
+* **Xcode (for iOS development):** Install from the Mac App Store.
+    * Ensure **Command Line Tools** are installed:
+        ```bash
+        xcode-select --install
+        ```
+* **CocoaPods (for iOS native dependencies):**
+    ```bash
+    sudo gem install cocoapods
+    ```
+* **Android Studio (for Android development):** Required for Android SDK, platform tools, and setting up an emulator. Refer to the [React Native Environment Setup Guide](https://reactnative.dev/docs/environment-setup) for detailed Android configurations.
+
+## Installation
+
+Follow these steps to get AssureDex up and running on your local machine:
+
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/legs30011/Assuresoft-ReactNative-App.git](https://github.com/legs30011/Assuresoft-ReactNative-App.git)
+    cd Assuresoft-ReactNative-App
+    ```
+
+2.  **Install JavaScript dependencies:**
+    This command will install all packages listed in your `package.json`.
+    ```bash
+    npm install
+    # OR if using Yarn:
+    # yarn install
+    ```
+
+3.  **Install iOS native dependencies (CocoaPods):**
+    ```bash
+    cd ios
+    pod install
+    cd ..
+    ```
+
+4.  **Configure `react-native-vector-icons` (Crucial for Icons):**
+    This library requires linking its font files to your native iOS and Android projects.
+
+    a.  **Create/Verify `react-native.config.js`:**
+        In the root directory of your project (where `package.json` is located), ensure you have a file named `react-native.config.js` with the following content. This configuration tells React Native where to find your custom assets and linked libraries' assets.
+
+        ```javascript
+        // react-native.config.js
+        module.exports = {
+          assets: [
+            './node_modules/react-native-vector-icons/Fonts/', // Required for react-native-vector-icons
+            './assets/fonts/', // If you have custom fonts in this directory
+            // Add other asset folders here if they need explicit linking, e.g., './assets/images/'
+          ],
+        };
+        ```
+
+    b.  **Verify `babel.config.js`:**
+        Ensure your `babel.config.js` does **NOT** contain an `assets` array. It should only define presets and plugins, with `react-native-reanimated/plugin` being the last one.
+
+        ```javascript
+        // babel.config.js
+        module.exports = {
+          presets: ['module:@react-native/babel-preset'],
+          plugins: [
+            'react-native-reanimated/plugin', // Must be the last plugin
+          ],
+        };
+        ```
+
+    c.  **Run Autolinking:**
+        From the root directory of your project, run:
+        ```bash
+        npx react-native link
+        ```
+
+    d.  **Manual iOS Linking Steps in Xcode (Highly Recommended if icons don't appear):**
+        Even with autolinking, sometimes manual steps are needed for iOS due to caching or specific Xcode setups.
+
+        i.  Open your project in Xcode. Navigate to `ios/YourProjectName.xcworkspace` (replace `YourProjectName` with your actual project's name, e.g., `AssureDex.xcworkspace`).
+        ii. In the Project Navigator (left pane), right-click on your project's main folder (e.g., `AssureDex`) and select `Add Files to "AssureDex..."`.
+        iii. Navigate to `node_modules/react-native-vector-icons/Fonts/` and select **all `.ttf` font files** (e.g., `MaterialCommunityIcons.ttf`, `FontAwesome5_Solid.ttf`, etc., depending on which icon sets you use). Click "Add". Ensure "Copy items if needed" is checked.
+        iv. Select your project target (usually named `AssureDex`) in the Xcode sidebar. Go to `Build Phases` -> `Copy Bundle Resources`. Verify that all the `.ttf` files you just added are listed here. If not, add them.
+        v.  Go to the `Info` tab (or open `Info.plist`). Add a new row to `Information Property List`. The key should be `UIAppFonts` (or select "Fonts provided by application"). This will create an array.
+        vi. For each `.ttf` file you added, add an item to this array with its **exact filename** (e.g., `MaterialCommunityIcons.ttf`).
+        vii. In Xcode, clean the build folder (`Product` > `Clean Build Folder`) and then build (`Product` > `Build`).
+
+## Running the App
+
+After completing the installation and linking steps, you can run the application on an emulator/simulator or a physical device:
+
+1.  **Start the Metro Bundler:**
+    This command starts the development server. Use `--reset-cache` to clear any old caches, which is highly recommended after dependency or configuration changes.
+    ```bash
+    npx react-native start --reset-cache
+    ```
+
+2.  **Run on iOS Simulator/Device:**
+    Open a **new terminal window** (keep the Metro Bundler running in the first one) and execute:
+    ```bash
+    npx react-native run-ios
+    ```
+
+3.  **Run on Android Emulator/Device:**
+    Open a **new terminal window** (keep the Metro Bundler running in the first one) and execute:
+    ```bash
+    npx react-native run-android
+    ```
+
+## Project Structure
+
+The project adheres to a standard React Native architecture, promoting modularity and maintainability:
+
+AssureDex/
+├── src/                                  # Source code
+│   ├── assets/                           # Static assets (images, fonts)
+│   │   ├── backgrounds/
+│   │   ├── icons/
+│   │   └── trainers/
+│   ├── components/                       # Reusable UI components (e.g., Footer.tsx, CustomAlertDialog.tsx)
+│   ├── navigation/                       # Navigation setup and utilities (e.g., RootNavigation.ts)
+│   ├── sections/                         # Individual app screens/features
+│   │   ├── abilities/                    # AbilitiesScreen.tsx
+│   │   ├── common/                       # Common/Utility screens (e.g., ComingSoonScreen.tsx, SearchScreen.tsx, NotificationsScreen.tsx, UserScreen.tsx)
+│   │   ├── evolution/                    # EvolutionScreen.tsx
+│   │   ├── homeScreen/                   # HomeScreen.tsx (Your main landing screen)
+│   │   ├── items/                        # ItemsScreen.tsx
+│   │   ├── locationDetailScreen/         # LocationDetailScreen.tsx
+│   │   ├── moves/                        # MovesScreen.tsx
+│   │   ├── natures/                      # NaturesScreen.tsx
+│   │   ├── pokemonDetailScreen/          # PokemonDetailScreen.tsx
+│   │   ├── pokemonList/                  # PokemonListScreen.tsx (previously named Pokemon.tsx)
+│   │   └── typeChart/                    # TypeChartScreen.tsx
+│   └── types/                            # TypeScript type definitions (e.g., navigation.d.ts)
+├── App.tsx                               # Root component of the application (or your primary navigator setup)
+├── index.js                              # Entry point for React Native
+├── babel.config.js                       # Babel configuration for JavaScript transpilation
+├── package.json                          # Project dependencies and scripts
+├── Podfile                               # iOS dependency management (CocoaPods)
+├── react-native.config.js                # React Native CLI configuration for linking native modules/assets
+└── tsconfig.json                         # TypeScript configuration
+
+## Visuals
+### Image Syntax
+
+To embed an image, use the standard Markdown syntax:
+
+```markdown
+![Home:](../Assuresoft-ReactNativeApp/src/assets/screenShots/1s.png)
+![Pokedex Start:](../Assuresoft-ReactNativeApp/src/assets/screenShots/2s.png)
+![Info Pokemon](../Assuresoft-ReactNativeApp/src/assets/screenShots/3s.png)
+![Search by Number:](../Assuresoft-ReactNativeApp/src/assets/screenShots/4s.png)
+![Search by Word:](../Assuresoft-ReactNativeApp/src/assets/screenShots/5s.png)
 
 Dependencies
+Key dependencies utilized in this project (as per package.json):
 
+@react-navigation/native: Core navigation utilities.
+@react-navigation/native-stack: Native stack navigator for iOS and Android.
+@react-navigation/stack: Deprecated in favor of native-stack but often used for common patterns or older projects. (Consider migrating to native-stack if not already fully done).
+axios: Promise-based HTTP client for making API requests (e.g., to PokeAPI).
+react: The core React library.
+react-native: The core React Native framework.
+react-native-gesture-handler: Provides native-driven gesture management.
+react-native-linear-gradient: For customizable gradient backgrounds.
+react-native-progress: For progress indicators.
+react-native-reanimated: For highly performant native-driven animations.
+react-native-reanimated-carousel: For animated carousel components.
+react-native-safe-area-context: Provides utilities to handle safe area insets.
+react-native-screens: Optimizes memory usage and performance for screens.
+react-native-vector-icons: Customizable icons.
+react-native-svg: If you are using SVG images directly in your components.
+Acknowledgements
+PokeAPI: This project heavily relies on data provided by PokeAPI, a free and open-source RESTful API that provides access to a vast amount of Pokémon data. We extend our gratitude for their invaluable resource.
 Troubleshooting
+Encountering issues during development is common. Here are solutions for frequently observed problems:
 
-Features
-Pokédex: Browse and search for Pokémon.
+"Error: Text string must be rendered within a <Text> component"
+Problem: You have plain text content directly inside a View or another component that is not a Text component. React Native requires all textual content to be encapsulated within a <Text> component.
+Solution: Wrap all text strings in a <Text> component.
 
-Moves: Explore various Pokémon moves.
+JavaScript
 
-Abilities: Learn about different Pokémon abilities.
+// Incorrect:
+<View>My text here</View>
 
-Items: Discover items in the Pokémon world.
+// Correct:
+<View><Text>My text here</Text></View>
+Icons showing as ? or squares
+Problem: This is a common issue with react-native-vector-icons and indicates that the font files are not correctly linked to your native iOS or Android project.
+Solution: Carefully re-check all steps in the "Configure react-native-vector-icons" section above, especially the manual steps for iOS in Xcode. After making changes, a thorough clean and rebuild are essential.
 
-Parties: (Coming Soon) Manage your Pokémon teams.
+Bash
 
-Locations: (Coming Soon) Explore different regions and places.
+cd ios && pod install && cd .. # Reinstall pods for iOS
+# Then perform a full clean and restart (see below)
+Invariant Violation: requireNativeComponent: 'RNCWebView' was not found / Similar native module errors
+Problem: This error occurs when a native module (like react-native-webview or others) is not correctly linked or compiled into your native app.
+Solution:
 
-Natures: Understand the effects of Pokémon natures.
+Ensure the library is properly installed (npm install your-library).
+Verify react-native.config.js is correctly configured for the library (though many newer libraries autolink without explicit entries).
+Often fixed by a full clean and cache reset:
+Bash
 
-Type Chart: A detailed guide on Pokémon type effectiveness.
+# Perform the full clean and restart steps (see below)
+Build failures after npm install or pod install
+Problem: Corrupted caches or inconsistent dependency states can lead to build failures.
+Solution: Execute a comprehensive clean and reinstall process. This is the most reliable way to ensure a fresh state for your project.
 
-Clean User Interface: A modern and intuitive design with gradients and custom icons.
+Bash
 
-Prerequisites
-Before you begin, ensure you have the following installed:
+# 1. Close all running Metro Bundler terminals and Xcode/Android Studio instances.
+# 2. Navigate to your project's root directory in your terminal.
 
-Node.js (>=18): Download Node.js
-
-npm (comes with Node.js) or Yarn
-
-React Native CLI:
-
-npm install -g react-native-cli
-
-Xcode (for iOS development): Install from the Mac App Store. Ensure Command Line Tools are installed (xcode-select --install).
-
-CocoaPods (for iOS native dependencies):
-
-sudo gem install cocoapods
-
-Installation
-Follow these steps to set up the project locally:
-
-Clone the repository:
-
-git clone https://github.com/legs30011/Assuresoft-ReactNative-App.git
-cd Assuresoft-ReactNative-App
-
-Install JavaScript dependencies:
-This command will install all packages listed in your package.json.
-
-npm install
-# OR if using Yarn:
-# yarn install
-
-Install iOS native dependencies (CocoaPods):
-
-cd ios
-pod install
-cd ..
-
-Configure react-native-vector-icons (Crucial for Icons):
-This library requires linking its font files to your native iOS project.
-
-a.  Create/Verify react-native.config.js:
-In the root directory of your project (where package.json is located), ensure you have a file named react-native.config.js with the following content:
-javascript module.exports = { assets: ['./node_modules/react-native-vector-icons/Fonts/'], }; 
-
-b.  Run Autolinking:
-From the root directory of your project, run:
-bash npx react-native link 
-
-c.  Manual iOS Linking Steps in Xcode (Highly Recommended if icons don't appear):
-Even with autolinking, sometimes manual steps are needed for iOS.
-
-i.  Open your project in Xcode. Navigate to `ios/YourProjectName.xcworkspace`.
-ii. In the Project Navigator (left pane), right-click on your project's main folder (e.g., `AssureDex`) and select `Add Files to "AssureDex..."`.
-iii. Navigate to `node_modules/react-native-vector-icons/Fonts/` and select **all `.ttf` font files** (e.g., `MaterialCommunityIcons.ttf`, `FontAwesome5_Solid.ttf`, etc., depending on which icon sets you use). Click "Add". Ensure "Copy items if needed" is checked.
-iv. Select your project target (usually named `AssureDex`) in the Xcode sidebar. Go to `Build Phases` -> `Copy Bundle Resources`. Verify that all the `.ttf` files you just added are listed here. If not, add them.
-v.  Go to the `Info` tab (or open `Info.plist`). Add a new row to `Information Property List`. The key should be `UIAppFonts` (or select "Fonts provided by application"). This will create an array.
-vi. For each `.ttf` file, add an item to this array with its **exact filename** (e.g., `MaterialCommunityIcons.ttf`).
-vii. In Xcode, clean the build folder (`Product` > `Clean Build Folder`) and then build (`Product` > `Build`).
-
-Running the App
-After installation and linking, you can run the app:
-
-Start the Metro Bundler:
-This command starts the development server. Use --reset-cache to clear any old caches, which is useful after dependency changes.
-
-npx react-native start --reset-cache
-
-Run on iOS Simulator/Device:
-Open a new terminal window (keep the Metro Bundler running in the first one) and run:
-
-npx react-native run-ios
-
-Project Structure
-The project follows a standard React Native structure:
-
-src/
-├── assets/                  # Static assets like images (icons, backgrounds, trainers)
-│   ├── backgrounds/
-│   ├── icons/
-│   └── trainers/
-├── components/              # Reusable UI components (e.g., CustomAlertDialog)
-├── navigation/              # Navigation setup and utilities (e.g., RootNavigation.ts)
-├── sections/                # Contains individual app screens/features
-│   ├── abilities/           # AbilitiesScreen.tsx
-│   ├── common/              # Common screens like ComingSoonScreen
-│   ├── homeScreen/          # HomeScreen.tsx (your main screen)
-│   ├── items/               # ItemsScreen.tsx
-│   ├── locationDetailScreen/
-│   ├── moves/               # MovesScreen.tsx
-│   ├── natures/             # NaturesScreen.tsx
-│   ├── pokemonDetailScreen/
-│   ├── pokemoninfo/
-│   └── typeChart/           # TypeChartScreen.tsx
-└── types/                   # TypeScript type definitions (e.g., navigation.d.ts)
-
-Visuals (Adding Images to README)
-You can easily embed images in your README.md file using Markdown syntax. This is great for showcasing screenshots of your app!
-
-Image Syntax
-To embed an image, use the following format:
-
-![Alt text for the image](URL_del_imagen "Título opcional del imagen")
-
-Alt text for the image: This is important for accessibility. It describes the image if it cannot be displayed (e.g., slow internet, screen reader). Make it descriptive!
-
-URL_del_imagen: This is the direct link to your image. This can be:
-
-A URL to an image hosted online (e.g., https://example.com/screenshot.png). This is the most common and reliable method for GitHub README files.
-
-A relative path to an image within your GitHub repository (e.g., ./screenshots/home.png). This works well if you store your screenshots directly in your repo.
-
-"Título opcional del imagen": (Optional) This text appears when a user hovers over the image.
-
-Examples
-Here's how you might add a screenshot of your home screen:
-
-![Screenshot of the AssureDex Home Screen](https://placehold.co/600x400/E73B5B/FFFFFF?text=HOME+SCREEN+HERE "AssureDex Home Screen")
-
-Result:
-
-
-You can add more images to illustrate different features or screens. Remember to replace the placeholder URL with your actual image URLs.
-
-Dependencies
-Key dependencies used in this project (as per package.json):
-
-@react-navigation/native
-
-@react-navigation/native-stack
-
-@react-navigation/stack
-
-axios
-
-react
-
-react-native
-
-react-native-gesture-handler
-
-react-native-linear-gradient
-
-react-native-progress
-
-react-native-reanimated
-
-react-native-reanimated-carousel
-
-react-native-safe-area-context
-
-react-native-screens
-
-react-native-vector-icons
-
-react-native-svg (if you were using SVG images directly)
-
-Troubleshooting
-"Error: Text string must be rendered within a <Text> component":
-This means you have plain text directly in a <View> or other component that isn't a <Text> component. Wrap all text content in <Text>.
-
-Icons showing as ? or squares:
-This is the most common issue with react-native-vector-icons and indicates that the font files are not correctly linked to your native project. Carefully re-check all steps in the "Configure react-native-vector-icons" section above, especially the manual steps for iOS in Xcode. A clean build folder (Product > Clean Build Folder in Xcode) and a fresh pod install (cd ios && pod install) are often required.
-
-"Invariant Violation: requireNativeComponent: 'RNCWebView' was not found" / Similar native module errors:
-Often fixed by re-running npm install, cd ios && pod install, and then npx react-native start --reset-cache. Ensure your npx react-native link step was successful if manual linking is not applicable for a specific library.
-
-Build failures after npm install or pod install:
-Try cleaning your project:
-
-iOS: In Xcode, Product > Clean Build Folder. Then, cd ios && pod install && cd ...
-
-General: Delete node_modules and Podfile.lock (if on iOS), clear caches, and reinstall:
-
+# 3. Clean node_modules
 rm -rf node_modules
+
+# 4. Clear Metro Bundler caches
 rm -rf $TMPDIR/metro-*
 rm -rf $TMPDIR/haste-map-*
-npm cache clean --force
+
+# 5. Clear npm/Yarn cache
+npm cache clean --force # Or 'yarn cache clean --all' if using Yarn
+
+# 6. Reset Watchman (if used)
 watchman watch-del-all
-npm install
-cd ios && rm Podfile.lock && pod install && cd .. # For iOSAssureDex React Native Pokémon App
-Welcome to AssureDex, a React Native application designed to provide a comprehensive guide to the Pokémon universe. This app aims to be a functional Pokédex, along with sections for Moves, Abilities, Items, Parties, Locations, Natures, and Type Charts.
 
-Table of Contents
-Features
+# 7. Reinstall JavaScript dependencies
+npm install # Or 'yarn install'
 
-Prerequisites
-
-Installation
-
-Running the App
-
-Project Structure
-
-Visuals (Adding Images to README)
-
-Dependencies
-
-Troubleshooting
-
-Features
-Pokédex: Browse and search for Pokémon.
-
-Moves: Explore various Pokémon moves.
-
-Abilities: Learn about different Pokémon abilities.
-
-Items: Discover items in the Pokémon world.
-
-Parties: (Coming Soon) Manage your Pokémon teams.
-
-Locations: (Coming Soon) Explore different regions and places.
-
-Natures: Understand the effects of Pokémon natures.
-
-Type Chart: A detailed guide on Pokémon type effectiveness.
-
-Clean User Interface: A modern and intuitive design with gradients and custom icons.
-
-Prerequisites
-Before you begin, ensure you have the following installed:
-
-Node.js (>=18): Download Node.js
-
-npm (comes with Node.js) or Yarn
-
-React Native CLI:
-
-npm install -g react-native-cli
-
-Xcode (for iOS development): Install from the Mac App Store. Ensure Command Line Tools are installed (xcode-select --install).
-
-CocoaPods (for iOS native dependencies):
-
-sudo gem install cocoapods
-
-Installation
-Follow these steps to set up the project locally:
-
-Clone the repository:
-
-git clone https://github.com/legs30011/Assuresoft-ReactNative-App.git
-cd Assuresoft-ReactNative-App
-
-Install JavaScript dependencies:
-This command will install all packages listed in your package.json.
-
-npm install
-# OR if using Yarn:
-# yarn install
-
-Install iOS native dependencies (CocoaPods):
-
+# 8. For iOS: Clean Pods and reinstall
 cd ios
-pod install
+rm Podfile.lock # Delete Podfile.lock to force a fresh install
+rm -rf Pods     # Delete Pods directory
+pod install     # Reinstall pods
 cd ..
 
-Configure react-native-vector-icons (Crucial for Icons):
-This library requires linking its font files to your native iOS project.
+# 9. For Android: Clean Android build
+cd android
+./gradlew clean # On Windows: 'gradlew clean'
+cd ..
 
-a.  Create/Verify react-native.config.js:
-In the root directory of your project (where package.json is located), ensure you have a file named react-native.config.js with the following content:
-javascript module.exports = { assets: ['./node_modules/react-native-vector-icons/Fonts/'], }; 
-
-b.  Run Autolinking:
-From the root directory of your project, run:
-bash npx react-native link 
-
-c.  Manual iOS Linking Steps in Xcode (Highly Recommended if icons don't appear):
-Even with autolinking, sometimes manual steps are needed for iOS.
-
-i.  Open your project in Xcode. Navigate to `ios/YourProjectName.xcworkspace`.
-ii. In the Project Navigator (left pane), right-click on your project's main folder (e.g., `AssureDex`) and select `Add Files to "AssureDex..."`.
-iii. Navigate to `node_modules/react-native-vector-icons/Fonts/` and select **all `.ttf` font files** (e.g., `MaterialCommunityIcons.ttf`, `FontAwesome5_Solid.ttf`, etc., depending on which icon sets you use). Click "Add". Ensure "Copy items if needed" is checked.
-iv. Select your project target (usually named `AssureDex`) in the Xcode sidebar. Go to `Build Phases` -> `Copy Bundle Resources`. Verify that all the `.ttf` files you just added are listed here. If not, add them.
-v.  Go to the `Info` tab (or open `Info.plist`). Add a new row to `Information Property List`. The key should be `UIAppFonts` (or select "Fonts provided by application"). This will create an array.
-vi. For each `.ttf` file, add an item to this array with its **exact filename** (e.g., `MaterialCommunityIcons.ttf`).
-vii. In Xcode, clean the build folder (`Product` > `Clean Build Folder`) and then build (`Product` > `Build`).
-
-Running the App
-After installation and linking, you can run the app:
-
-Start the Metro Bundler:
-This command starts the development server. Use --reset-cache to clear any old caches, which is useful after dependency changes.
-
+# 10. Start the Metro Bundler with a fresh cache
 npx react-native start --reset-cache
 
-Run on iOS Simulator/Device:
-Open a new terminal window (keep the Metro Bundler running in the first one) and run:
-
-npx react-native run-ios
-
-Project Structure
-The project follows a standard React Native structure:
-
-src/
-├── assets/                  # Static assets like images (icons, backgrounds, trainers)
-│   ├── backgrounds/
-│   ├── icons/
-│   └── trainers/
-├── components/              # Reusable UI components (e.g., CustomAlertDialog)
-├── navigation/              # Navigation setup and utilities (e.g., RootNavigation.ts)
-├── sections/                # Contains individual app screens/features
-│   ├── abilities/           # AbilitiesScreen.tsx
-│   ├── common/              # Common screens like ComingSoonScreen
-│   ├── homeScreen/          # HomeScreen.tsx (your main screen)
-│   ├── items/               # ItemsScreen.tsx
-│   ├── locationDetailScreen/
-│   ├── moves/               # MovesScreen.tsx
-│   ├── natures/             # NaturesScreen.tsx
-│   ├── pokemonDetailScreen/
-│   ├── pokemoninfo/
-│   └── typeChart/           # TypeChartScreen.tsx
-└── types/                   # TypeScript type definitions (e.g., navigation.d.ts)
-
-Visuals (Adding Images to README)
-You can easily embed images in your README.md file using Markdown syntax. This is great for showcasing screenshots of your app!
-
-Image Syntax
-To embed an image, use the following format:
-
-![Alt text for the image](URL_del_imagen "Título opcional del imagen")
-
-Alt text for the image: This is important for accessibility. It describes the image if it cannot be displayed (e.g., slow internet, screen reader). Make it descriptive!
-
-URL_del_imagen: This is the direct link to your image. This can be:
-
-A URL to an image hosted online (e.g., https://example.com/screenshot.png). This is the most common and reliable method for GitHub README files.
-
-A relative path to an image within your GitHub repository (e.g., ./screenshots/home.png). This works well if you store your screenshots directly in your repo.
-
-"Título opcional del imagen": (Optional) This text appears when a user hovers over the image.
-
-Examples
-Here's how you might add a screenshot of your home screen:
-
-![Screenshot of the AssureDex Home Screen](https://placehold.co/600x400/E73B5B/FFFFFF?text=HOME+SCREEN+HERE "AssureDex Home Screen")
-
-Result:
-
-
-You can add more images to illustrate different features or screens. Remember to replace the placeholder URL with your actual image URLs.
-
-Dependencies
-Key dependencies used in this project (as per package.json):
-
-@react-navigation/native
-
-@react-navigation/native-stack
-
-@react-navigation/stack
-
-axios
-
-react
-
-react-native
-
-react-native-gesture-handler
-
-react-native-linear-gradient
-
-react-native-progress
-
-react-native-reanimated
-
-react-native-reanimated-carousel
-
-react-native-safe-area-context
-
-react-native-screens
-
-react-native-vector-icons
-
-react-native-svg (if you were using SVG images directly)
-
-Troubleshooting
-"Error: Text string must be rendered within a <Text> component":
-This means you have plain text directly in a <View> or other component that isn't a <Text> component. Wrap all text content in <Text>.
-
-Icons showing as ? or squares:
-This is the most common issue with react-native-vector-icons and indicates that the font files are not correctly linked to your native project. Carefully re-check all steps in the "Configure react-native-vector-icons" section above, especially the manual steps for iOS in Xcode. A clean build folder (Product > Clean Build Folder in Xcode) and a fresh pod install (cd ios && pod install) are often required.
-
-"Invariant Violation: requireNativeComponent: 'RNCWebView' was not found" / Similar native module errors:
-Often fixed by re-running npm install, cd ios && pod install, and then npx react-native start --reset-cache. Ensure your npx react-native link step was successful if manual linking is not applicable for a specific library.
-
-Build failures after npm install or pod install:
-Try cleaning your project:
-
-iOS: In Xcode, Product > Clean Build Folder. Then, cd ios && pod install && cd ...
-
-General: Delete node_modules and Podfile.lock (if on iOS), clear caches, and reinstall:
-
-rm -rf node_modules
-rm -rf $TMPDIR/metro-*
-rm -rf $TMPDIR/haste-map-*
-npm cache clean --force
-watchman watch-del-all
-npm install
-cd ios && rm Podfile.lock && pod install && cd .. # For iOS
-
+# 11. Rebuild and run your app
+# For iOS: npx react-native run-ios
+# For Android: npx react-native run-android
+License
+This project is licensed under the MIT License - see the LICENSE file for details.
