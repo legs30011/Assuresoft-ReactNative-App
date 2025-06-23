@@ -192,11 +192,11 @@ Visuals
 
 Image Syntax
 
-![Alt text for the image](../Assuresoft-ReactNativeApp/src/assets/screenShots/1s.png "Home Screen:")
-![Alt text for the image](../Assuresoft-ReactNativeApp/src/assets/screenShots/2s.png "Pokédex Start (List View):")
-![Alt text for the image](../Assuresoft-ReactNativeApp/src/assets/screenShots/3s.png "Pokémon Detail Information:")
-![Alt text for the image](../Assuresoft-ReactNativeApp/src/assets/screenShots/4s.png "Search by Number:")
-![Alt text for the image](../Assuresoft-ReactNativeApp/src/assets/screenShots/5s.png "Search by Word (Name):")
+![Alt text for the image](src/assets/screenShots/1s.png "Home Screen:")
+![Alt text for the image](src/assets/screenShots/2s.png "Pokédex Start (List View):")
+![Alt text for the image](src/assets/screenShots/3s.png "Pokémon Detail Information:")
+![Alt text for the image](src/assets/screenShots/4s.png "Search by Number:")
+![Alt text for the image](src/assets/screenShots/5s.png "Search by Word (Name):")
 
 
 Dependencies
