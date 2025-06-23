@@ -256,8 +256,9 @@ Solution: Execute a comprehensive clean and reinstall process. This is the most 
 Bash
 
 # 1. Close all running Metro Bundler terminals and Xcode/Android Studio instances.
+control f4 , cnrl shift delete and close process
 # 2. Navigate to your project's root directory in your terminal.
-
+cd .. ,o in finder o windows search 
 # 3. Clean node_modules
 rm -rf node_modules
 
@@ -290,8 +291,11 @@ cd ..
 npx react-native start --reset-cache
 
 # 11. Rebuild and run your app
-# For iOS: npx react-native run-ios
-# For Android: npx react-native run-android
+Examples:
+# For iOS: 
+npx react-native run-ios
+# For Android: 
+npx react-native run-android
 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 &lt;/immersive>
