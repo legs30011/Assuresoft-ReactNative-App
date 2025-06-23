@@ -185,13 +185,6 @@ AssureDex/
 
 
 ## Visuals
-
-You can easily embed screenshots or GIFs of your application within this README to provide a visual overview of its features and design.
-
-### Image Syntax
-
-To embed an image, use the standard Markdown syntax. It's recommended to place your screenshot images in a dedicated folder (e.g., `screenshots/`) at the root of your repository, or use a consistent path relative to your `README.md`.
-
 ```markdown
 Examples
 Here are the direct displays of your screenshots. These paths assume your README.md file is located at the root of your repository and your images are in src/assets/screenShots/ relative to that root.
