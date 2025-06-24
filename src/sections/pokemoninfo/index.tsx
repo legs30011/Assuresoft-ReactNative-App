@@ -12,12 +12,15 @@ import {
   Dimensions,
   TextInput,
   Platform,
+  ImageBackground,
 } from 'react-native';
 import axios from 'axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { navigate } from '../../navigation/RootNavigation';
 import CustomAlertDialog from '../../components/customAlertDialog/CustomAlertDialog';
-import Footer from '../../sections/footer/Footer';
+import Footer from '../footer/Footer'; // Asegúrate de que esta ruta sea correcta
+import { LinearGradient } from 'react-native-linear-gradient';
+import { JSX } from 'react/jsx-runtime';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN_HORIZONTAL = 10;
@@ -26,6 +29,7 @@ const NUM_COLUMNS = 3;
 const CONTAINER_HORIZONTAL_PADDING = 20;
 const CALCULATED_CARD_WIDTH =
   (width - (CONTAINER_HORIZONTAL_PADDING * 2) - (CARD_MARGIN_HORIZONTAL * (NUM_COLUMNS - 1))) / NUM_COLUMNS;
+const BACKGROUND_IMAGE = require('../../assets/icons/pokedex.png');
 
 // --- TYPE DEFINITIONS ---
 interface PokemonTypeSlot {
@@ -68,7 +72,7 @@ interface PokemonListItemDisplay extends PokemonDetailData {
   primaryTypeColor?: string;
 }
 
-interface PokemonListScreenProps { // Renamed from PokemonProps for clarity
+interface PokemonListScreenProps { 
   selectedType?: string;
 }
 const POKEMON_TYPE_COLORS: { [key: string]: string } = {
@@ -92,8 +96,7 @@ const POKEMON_TYPE_COLORS: { [key: string]: string } = {
   dark: '#707070',
 };
 
-// PokeBallIcon (assuming this is used in the header for this screen)
-const PokeBallIcon = ({ size = 24 }) => (
+const PokeBallIcon = ({ size = 24 }: { size?: number }): JSX.Element => (
   <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
     <View style={{
       width: size,
@@ -137,7 +140,7 @@ const PokeBallIcon = ({ size = 24 }) => (
 );
 
 
-export default function PokemonListScreen({ selectedType }: PokemonListScreenProps) {
+export default function PokemonListScreen({ selectedType }: PokemonListScreenProps): JSX.Element {
   const insets = useSafeAreaInsets();
 
   const [allPokemons, setAllPokemons] = useState<PokemonListItemDisplay[]>([]);
@@ -147,7 +150,6 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
   const [error, setError] = useState<string | null>(null);
   const [sortById, setSortById] = useState<boolean>(true);
 
-  // States for the recommended Pokémon modal
   const [isRecommendedPokemonModalVisible, setIsRecommendedPokemonModalVisible] = useState(false);
   const [recommendedPokemon, setRecommendedPokemon] = useState<{ name: string; id: number; imageUrl: string } | null>(null);
 
@@ -239,7 +241,7 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
 
     return (
       <TouchableOpacity
-        style={styles.pokemonCardContainer}
+        style={[styles.pokemonCardContainer, { backgroundColor: item.primaryTypeColor || '#666666' }]} // Dynamic background color
         onPress={() => {
           navigate('PokemonDetailScreen', {
               pokemonId: item.id,
@@ -265,7 +267,7 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
 
   if (loading) {
     return (
-      <View style={[styles.centeredContent, { paddingTop: insets.top + 20 }]}>
+      <View style={[styles.fullScreen, styles.centeredContent]}>
         <ActivityIndicator size="large" color="#E73B5B" />
         <Text style={styles.loadingText}>Loading Pokémon...</Text>
       </View>
@@ -273,77 +275,91 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
   }
   if (error) {
     return (
-      <View style={[styles.centeredContent, { paddingTop: insets.top + 20 }]}>
+      <View style={[styles.fullScreen, styles.centeredContent]}>
         <Text style={styles.errorText}>Oops! Something went wrong:</Text>
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
   return (
-    <View style={styles.container}>
-      <View style={[styles.headerContainer, { paddingTop: insets.top + (Platform.OS === 'ios' ? 10 : 0) }]}>
-        <PokeBallIcon size={30} />
-        <Text style={styles.headerTitle}>Pokédex</Text>
-        <TouchableOpacity
-          style={styles.headerRightIcon}
-          onPress={() => setSortById(prev => !prev)}
-        >
-          <Text style={styles.headerRightIconText}>{sortById ? '#' : 'AZ'}</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.searchBarContainer}>
-        <Text style={styles.searchIcon}>🔍</Text>
-        <TextInput
-          style={styles.searchTextInput}
-          placeholder="Search"
-          placeholderTextColor="#666666"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
-      </View>
-      {filteredPokemons.length === 0 ? (
-        <View style={styles.emptyListContent}>
-          <Text style={styles.subText}>No Pokémon found.</Text>
+    <ImageBackground
+      source={BACKGROUND_IMAGE}
+      resizeMode="cover"
+      style={styles.fullScreen} // Use fullScreen style for ImageBackground
+    >
+      <LinearGradient
+        colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']} // Dark overlay for readability
+        style={styles.fullScreen} // Apply gradient over the entire background
+      >
+        <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'ios' ? 10 : 0) }]}>
+          <View style={styles.headerContainer}>
+            <PokeBallIcon size={30} />
+            <Text style={styles.headerTitle}>Pokédex</Text>
+            <TouchableOpacity
+              style={styles.headerRightIcon}
+              onPress={() => setSortById(prev => !prev)}
+            >
+              <Text style={styles.headerRightIconText}>{sortById ? '#' : 'AZ'}</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.searchBarContainer}>
+            <Text style={styles.searchIcon}>🔍</Text>
+            <TextInput
+              style={styles.searchTextInput}
+              placeholder="Search"
+              placeholderTextColor="#666666"
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+            />
+          </View>
+          {filteredPokemons.length === 0 ? (
+            <View style={styles.emptyListContent}>
+              <Text style={styles.subText}>No Pokémon found.</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredPokemons}
+              keyExtractor={(item) => String(item.id)}
+              numColumns={NUM_COLUMNS}
+              columnWrapperStyle={styles.columnWrapper}
+              contentContainerStyle={styles.pokemonListContent} 
+              renderItem={renderPokemonCard}
+              initialNumToRender={10}
+              maxToRenderPerBatch={5}
+              windowSize={10}
+              keyboardDismissMode="on-drag"
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              alwaysBounceVertical={false}
+            />
+          )}
         </View>
-      ) : (
-        <FlatList
-          data={filteredPokemons}
-          keyExtractor={(item) => String(item.id)}
-          numColumns={NUM_COLUMNS}
-          columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={styles.pokemonListContent} // Adjusted paddingBottom here
-          renderItem={renderPokemonCard}
-          initialNumToRender={10}
-          maxToRenderPerBatch={5}
-          windowSize={10}
-          keyboardDismissMode="on-drag"
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          alwaysBounceVertical={false}
-        />
-      )}
-      {recommendedPokemon && (
-        <CustomAlertDialog
-          isVisible={isRecommendedPokemonModalVisible}
-          title="Pokémon Recommendation!"
-          message={`Today's recommended Pokémon is ${recommendedPokemon.name.toUpperCase()} (ID: #${String(recommendedPokemon.id).padStart(3, '0')})!`}
-          imageUrl={recommendedPokemon.imageUrl}
-          imageAltText={`Image of ${recommendedPokemon.name}`}
-          onClose={() => setIsRecommendedPokemonModalVisible(false)}
-        />
-      )}
+        {recommendedPokemon && (
+          <CustomAlertDialog
+            isVisible={isRecommendedPokemonModalVisible}
+            title="Pokémon Recommendation!"
+            message={`Today's recommended Pokémon is ${recommendedPokemon.name.toUpperCase()} (ID: #${String(recommendedPokemon.id).padStart(3, '0')})!`}
+            imageUrl={recommendedPokemon.imageUrl}
+            imageAltText={`Image of ${recommendedPokemon.name}`}
+            onClose={() => setIsRecommendedPokemonModalVisible(false)}
+          />
+        )}
+      </LinearGradient>
       <Footer /> 
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  fullScreen: {
     flex: 1,
-    backgroundColor: '#000000',
+  },
+  container: {
+    flex: 1, // Will be within ImageBackground, so still flex: 1
+    // background color should not be here, as ImageBackground handles it
   },
   headerContainer: {
-    backgroundColor: '#FF0000',
+    backgroundColor: '#bf4141',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -419,7 +435,7 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   loadingText: {
-    color: '#ff0000',
+    color: '#fefefe',
     fontSize: 18,
     marginTop: 10,
   },
@@ -437,7 +453,7 @@ const styles = StyleSheet.create({
   },
   pokemonListContent: {
     paddingTop: 80,
-    paddingBottom: 100, // <--- AJUSTADO para hacer espacio al Footer (aprox. 70px de altura del Footer + insets)
+    paddingBottom: 100, 
   },
   columnWrapper: {
     justifyContent: 'space-between',
@@ -453,7 +469,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
-    backgroundColor: '#FFFFFF',
+    // Background color set dynamically in renderPokemonCard
     marginHorizontal: CARD_MARGIN_HORIZONTAL / 2,
   },
   pokemonCardContent: {
@@ -468,7 +484,7 @@ const styles = StyleSheet.create({
     right: 8,
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#666666',
+    color: '#FFFFFF', // Changed to white for better contrast on colored cards
   },
   pokemonImage: {
     width: '80%',
@@ -479,20 +495,20 @@ const styles = StyleSheet.create({
   pokemonImagePlaceholder: {
     width: '80%',
     height: '55%',
-    backgroundColor: '#E0E0E0',
+    backgroundColor: 'rgba(255,255,255,0.3)',
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 15,
   },
   pokemonImagePlaceholderText: {
-    color: '#999999',
+    color: '#FFFFFF',
     fontSize: 12,
   },
   pokemonName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#FFFFFF',
     textAlign: 'center',
     marginTop: 'auto',
     marginBottom: 5,

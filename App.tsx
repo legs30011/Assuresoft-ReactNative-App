@@ -9,7 +9,6 @@ import PokemonInfoScreen from './src/sections/pokemoninfo';
 import PokemonDetailScreen from './src/sections/pokemonDetailScreen/PokemonDetailScreen';
 import LocationDetailScreen from './src/sections/locationDetailScreen/LocationDetailScreen';
 import MovesScreen from './src/sections/moves/MovesScreen';
-import AbilitiesScreen from './src/sections/abilities/AbilitiesScreen';
 import ItemsScreen from './src/sections/items/ItemsScreen';
 import NaturesScreen from './src/sections/natures/NaturesScreen';
 import TypeChartScreen from './src/sections/typeChart/TypeChartScreen';
@@ -37,7 +36,6 @@ function App(): React.JSX.Element {
             <Stack.Screen name="LocationDetailScreen" component={LocationDetailScreen} />
             <Stack.Screen name="ComingSoonScreen" component={ComingSoonScreen} />
             <Stack.Screen name="MovesScreen" component={MovesScreen} />
-            <Stack.Screen name="AbilitiesScreen" component={AbilitiesScreen} />
             <Stack.Screen name="ItemsScreen" component={ItemsScreen} />
             <Stack.Screen name="NaturesScreen" component={NaturesScreen} />
             <Stack.Screen name="TypeChartScreen" component={TypeChartScreen} />

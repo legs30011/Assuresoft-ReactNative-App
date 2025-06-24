@@ -8,12 +8,10 @@ const { width } = Dimensions.get('window');
 
 // --- FOOTER ICONS ---
 const HOME_FOOTER_ICON = require('../../assets/icons/pokeball.webp');
-const NOTIFICATIONS_FOOTER_ICON_PLACEHOLDER = require('../../assets/icons/pokeball.webp');
-const USER_FOOTER_ICON_PLACEHOLDER = require('../../assets/icons/pokeball.webp');
+const NOTIFICATIONS_FOOTER_ICON = require('../../assets/icons/pokeball.webp'); 
+const USER_FOOTER_ICON = require('../../assets/icons/pokeball.webp');
 
-// Define las propiedades que el componente Footer puede recibir
-interface FooterProps {
-}
+interface FooterProps {}
 
 const Footer: React.FC<FooterProps> = () => {
   const insets = useSafeAreaInsets();
@@ -29,8 +27,8 @@ const Footer: React.FC<FooterProps> = () => {
           onPress={() => handleFooterNavigation('ComingSoonScreen', { from: 'Notifications' })}
         >
           <Image
-            source={{ uri: NOTIFICATIONS_FOOTER_ICON_PLACEHOLDER }}
-            style={styles.tabBarIcon}
+            source={NOTIFICATIONS_FOOTER_ICON}
+            style={styles.tabBarIcon} 
           />
           <Text style={styles.tabBarText}>Notifications</Text>
         </TouchableOpacity>
@@ -41,7 +39,7 @@ const Footer: React.FC<FooterProps> = () => {
         >
           <Image
             source={HOME_FOOTER_ICON}
-            style={[styles.tabBarIcon, styles.homeTabIcon]} 
+            style={[styles.tabBarIcon, styles.homeTabIcon]}
           />
           <Text style={styles.tabBarText}>Home</Text>
         </TouchableOpacity>
@@ -51,7 +49,7 @@ const Footer: React.FC<FooterProps> = () => {
           onPress={() => handleFooterNavigation('ComingSoonScreen', { from: 'User' })}
         >
           <Image
-            source={{ uri: USER_FOOTER_ICON_PLACEHOLDER }}
+            source={USER_FOOTER_ICON}
             style={styles.tabBarIcon}
           />
           <Text style={styles.tabBarText}>User</Text>
@@ -97,7 +95,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     resizeMode: 'contain',
-    tintColor: '#ffffff',
     marginBottom: 4,
   },
   homeTabIcon: {
