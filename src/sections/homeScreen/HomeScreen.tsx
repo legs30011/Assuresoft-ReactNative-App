@@ -23,10 +23,9 @@ const { width } = Dimensions.get('window');
 const BACKGROUND_IMAGE = require('../../assets/icons/pokedex.png');
 const POKEMON_CARD_ICON_LOCAL = require('../../assets/icons/pokeball.webp');
 const MOVES_CARD_ICON_LOCAL = require('../../assets/icons/fire.png');
-const EVOLUTION_CARD_ICON_LOCAL = require('../../assets/icons/evolution.png');
+const TEAM_CARD_ICON_LOCAL = require('../../assets/trainers/ashPokemon.webp');
 const SEARCH_ICON_LOCAL = require('../../assets/trainers/rival.webp');
 const MICROPHONE_ICON_LOCAL = require('../../assets/trainers/garyPokemon.webp'); 
-const APP_LOGO_IMAGE_LOCAL = require('../../assets/icons/pokedex.png');
 const NEW_HEADER_IMAGE = require('../../assets/trainers/pikachu.webp'); 
 const TYPES_CARD_ICON_PLACEHOLDER = require('../../assets/trainers/rival.webp');
 
@@ -45,9 +44,9 @@ const menuItems = [
     colors: ['#000000', '#ff7700'],
   },
   {
-    name:'Evolution',
-    icon: EVOLUTION_CARD_ICON_LOCAL,
-    screen: 'EvolutionScreen',
+    name:'YOUR TEAM',
+    icon: TEAM_CARD_ICON_LOCAL,
+    screen: 'YourTeamScreen',
     colors: ['#000000','#008977'],
   },
   {
@@ -83,8 +82,6 @@ export default function HomeScreen() {
     try {
       const pokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${query.toLowerCase()}`);
       const moveResponse = await fetch(`https://pokeapi.co/api/v2/move/${query.toLowerCase()}`);
-      const abilityResponse = await fetch(`https://pokeapi.co/api/v2/ability/${query.toLowerCase()}`);
-      const itemResponse = await fetch(`https://pokeapi.co/api/v2/item/${query.toLowerCase()}`);
 
       const results = [];
 
@@ -95,14 +92,6 @@ export default function HomeScreen() {
       if (moveResponse.ok) {
         const moveData = await moveResponse.json();
         results.push({ type: 'Move', name: moveData.name, id: moveData.id });
-      }
-      if (abilityResponse.ok) {
-        const abilityData = await abilityResponse.json();
-        results.push({ type: 'Ability', name: abilityData.name, id: abilityData.id });
-      }
-      if (itemResponse.ok) {
-        const itemData = await itemResponse.json();
-        results.push({ type: 'Item', name: itemData.name, id: itemData.id });
       }
 
       setSearchResults(results);
@@ -175,10 +164,7 @@ export default function HomeScreen() {
           style={styles.gradientOverlay}
         >
           <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'ios' ? 10 : 0) }]}>
-            {/* Top Bar - Simplified */}
             <View style={styles.topBar} />
-
-            {/* "What are you looking for?" Section with new image */}
             <View style={styles.greetingSection}>
               <Text style={styles.greetingText}>What are</Text>
               <View style={styles.greetingTitleRow}>
@@ -186,17 +172,15 @@ export default function HomeScreen() {
                 <Image
                   source={NEW_HEADER_IMAGE}
                   style={styles.newHeaderImage}
-                  resizeMode="contain" // Changed to 'contain' for better fitting
+                  resizeMode="contain" 
                 />
               </View>
               <Text style={styles.greetingSubtitle}>WELCOME TO POKEDEX</Text>
             </View>
-
-            {/* Search Input Section */}
             <View style={styles.searchContainer}>
               <Image
                 source={SEARCH_ICON_LOCAL}
-                style={[styles.searchIcon, { tintColor: undefined }]} // Removed tintColor to display original colors
+                style={[styles.searchIcon, { tintColor: undefined }]} 
               />
               <TextInput
                 style={styles.searchInput}
@@ -209,7 +193,7 @@ export default function HomeScreen() {
               <TouchableOpacity onPress={() => performUniversalSearch(searchText)}>
                 <Image
                   source={MICROPHONE_ICON_LOCAL}
-                  style={[styles.microphoneIcon, { tintColor: undefined }]} // Removed tintColor
+                  style={[styles.microphoneIcon, { tintColor: undefined }]}
                 />
               </TouchableOpacity>
             </View>
@@ -230,15 +214,12 @@ export default function HomeScreen() {
                 )}
               </View>
             )}
-
-            {/* Main Content Area with Scrollable Grid */}
             <ScrollView contentContainerStyle={styles.scrollContent}>
               <View style={styles.gridContainer}>
                 {menuItems.map((item, index) => (
                   <CardItem key={index} item={item} index={index} />
                 ))}
               </View>
-              {/* Central Bottom Image/Logo */}
             </ScrollView>
           </View>
         </LinearGradient>
@@ -330,7 +311,6 @@ const styles = StyleSheet.create({
     height: 24,
     resizeMode: 'contain',
     marginLeft: 10,
-    // tintColor: '#AAAAAA', // Removed tintColor
   },
   searchResultsContainer: {
     backgroundColor: 'rgba(0,0,0,0.6)',

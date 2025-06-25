@@ -18,8 +18,10 @@ import axios from 'axios';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { navigate } from '../../navigation/RootNavigation';
 import CustomAlertDialog from '../../components/customAlertDialog/CustomAlertDialog';
-import Footer from '../footer/Footer'; // Asegúrate de que esta ruta sea correcta
+import Footer from '../footer/Footer';
 import { LinearGradient } from 'react-native-linear-gradient';
+import { PokemonListItemDisplay } from '../../types/navigation'; // Import the shared type
+import { useFavorites } from '../context/FavoritesContext'; // NEW IMPORT
 import { JSX } from 'react/jsx-runtime';
 
 const { width } = Dimensions.get('window');
@@ -31,50 +33,8 @@ const CALCULATED_CARD_WIDTH =
   (width - (CONTAINER_HORIZONTAL_PADDING * 2) - (CARD_MARGIN_HORIZONTAL * (NUM_COLUMNS - 1))) / NUM_COLUMNS;
 const BACKGROUND_IMAGE = require('../../assets/icons/pokedex.png');
 
-// --- TYPE DEFINITIONS ---
-interface PokemonTypeSlot {
-  slot: number;
-  type: {
-    name: string;
-    url: string;
-  };
-}
-interface PokemonAbilitySlot {
-  ability: {
-    name: string;
-    url: string;
-  };
-  is_hidden: boolean;
-  slot: number;
-}
+// --- TYPE DEFINITIONS (MOVED TO navigation.d.ts for global access) ---
 
-interface PokemonSprites {
-  front_default: string | null;
-  other?: {
-    'official-artwork'?: {
-      front_default: string | null;
-    };
-  };
-}
-
-interface PokemonDetailData {
-  id: number;
-  name: string;
-  height: number;
-  weight: number;
-  sprites: PokemonSprites;
-  types: PokemonTypeSlot[];
-  abilities: PokemonAbilitySlot[];
-}
-
-interface PokemonListItemDisplay extends PokemonDetailData {
-  imageUrl?: string;
-  primaryTypeColor?: string;
-}
-
-interface PokemonListScreenProps { 
-  selectedType?: string;
-}
 const POKEMON_TYPE_COLORS: { [key: string]: string } = {
   normal: '#A8A77A',
   fire: '#FD7D24',
@@ -139,9 +99,15 @@ const PokeBallIcon = ({ size = 24 }: { size?: number }): JSX.Element => (
   </View>
 );
 
+const HeartIcon = ({ isFilled, size = 24, color = 'white' }: { isFilled: boolean; size?: number; color?: string; }): JSX.Element => (
+  <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
+    <Text style={{ fontSize: size, color: color }}>{isFilled ? '❤️' : '🤍'}</Text>
+  </View>
+);
 
-export default function PokemonListScreen({ selectedType }: PokemonListScreenProps): JSX.Element {
+export default function PokemonListScreen({ selectedType }: { selectedType?: string }): JSX.Element {
   const insets = useSafeAreaInsets();
+  const { likedPokemons, toggleFavorite } = useFavorites(); // USE CONTEXT
 
   const [allPokemons, setAllPokemons] = useState<PokemonListItemDisplay[]>([]);
   const [filteredPokemons, setFilteredPokemons] = useState<PokemonListItemDisplay[]>([]);
@@ -149,10 +115,35 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [sortById, setSortById] = useState<boolean>(true);
-
+  
   const [isRecommendedPokemonModalVisible, setIsRecommendedPokemonModalVisible] = useState(false);
   const [recommendedPokemon, setRecommendedPokemon] = useState<{ name: string; id: number; imageUrl: string } | null>(null);
 
+  const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
+  const [confirmModalData, setConfirmModalData] = useState<PokemonListItemDisplay | null>(null);
+  const [confirmActionType, setConfirmActionType] = useState<'add' | 'remove' | null>(null);
+
+  const showConfirmToggleDialog = (pokemon: PokemonListItemDisplay) => {
+    const isCurrentlyLiked = likedPokemons.some(p => p.id === pokemon.id);
+    setConfirmModalData(pokemon);
+    setConfirmActionType(isCurrentlyLiked ? 'remove' : 'add');
+    setIsConfirmModalVisible(true);
+  };
+
+  const handleConfirmAction = () => {
+    if (confirmModalData) {
+      toggleFavorite(confirmModalData); // Use context's toggleFavorite
+    }
+    setIsConfirmModalVisible(false);
+    setConfirmModalData(null);
+    setConfirmActionType(null);
+  };
+
+  const handleCancelAction = () => {
+    setIsConfirmModalVisible(false);
+    setConfirmModalData(null);
+    setConfirmActionType(null);
+  };
 
   const fetchAllPokemons = useCallback(async () => {
     setLoading(true);
@@ -162,17 +153,22 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
       const pokemonEntries = response.data.results;
 
       const pokemonDetailsPromises = pokemonEntries.map(async (entry: { name: string; url: string }) => {
-        const detailResponse = await axios.get<PokemonDetailData>(entry.url);
+        const detailResponse = await axios.get<any>(entry.url);
         const primaryType = detailResponse.data.types[0]?.type.name.toLowerCase();
         const primaryColor = primaryType ? POKEMON_TYPE_COLORS[primaryType] : '#666666';
-
         return {
-          ...detailResponse.data,
+          id: detailResponse.data.id,
+          name: detailResponse.data.name,
+          height: detailResponse.data.height,
+          weight: detailResponse.data.weight,
+          sprites: detailResponse.data.sprites,
+          types: detailResponse.data.types,
+          abilities: detailResponse.data.abilities,
           imageUrl: detailResponse.data.sprites?.other?.['official-artwork']?.front_default ||
                     detailResponse.data.sprites?.front_default ||
-                    undefined,
+                    'https://placehold.co/96x96/E0E0E0/999999?text=No+Img',
           primaryTypeColor: primaryColor,
-        };
+        } as PokemonListItemDisplay; // Explicitly cast
       });
 
       let pokemonsWithDetails = await Promise.all(pokemonDetailsPromises);
@@ -238,10 +234,11 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
 
   const renderPokemonCard = useCallback(({ item }: { item: PokemonListItemDisplay }) => {
     const pokemonIdFormatted = item.id ? `#${String(item.id).padStart(3, '0')}` : '';
+    const isLiked = likedPokemons.some(p => p.id === item.id);
 
     return (
       <TouchableOpacity
-        style={[styles.pokemonCardContainer, { backgroundColor: item.primaryTypeColor || '#666666' }]} // Dynamic background color
+        style={[styles.pokemonCardContainer, { backgroundColor: item.primaryTypeColor || '#666666' }]}
         onPress={() => {
           navigate('PokemonDetailScreen', {
               pokemonId: item.id,
@@ -250,6 +247,13 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
           });
         }}
       >
+        <TouchableOpacity 
+          style={styles.heartIconContainer}
+          onPress={() => showConfirmToggleDialog(item)}
+        >
+          <HeartIcon isFilled={isLiked} size={24} color={'white'} />
+        </TouchableOpacity>
+
         <View style={styles.pokemonCardContent}>
           <Text style={styles.pokemonId}>{pokemonIdFormatted}</Text>
           {item.imageUrl ? (
@@ -263,7 +267,7 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
         </View>
       </TouchableOpacity>
     );
-  }, []);
+  }, [likedPokemons, showConfirmToggleDialog]);
 
   if (loading) {
     return (
@@ -285,11 +289,11 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
     <ImageBackground
       source={BACKGROUND_IMAGE}
       resizeMode="cover"
-      style={styles.fullScreen} // Use fullScreen style for ImageBackground
+      style={styles.fullScreen}
     >
       <LinearGradient
-        colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']} // Dark overlay for readability
-        style={styles.fullScreen} // Apply gradient over the entire background
+        colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)']} 
+        style={styles.fullScreen} 
       >
         <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'ios' ? 10 : 0) }]}>
           <View style={styles.headerContainer}>
@@ -344,6 +348,19 @@ export default function PokemonListScreen({ selectedType }: PokemonListScreenPro
             onClose={() => setIsRecommendedPokemonModalVisible(false)}
           />
         )}
+        {isConfirmModalVisible && confirmModalData && (
+          <CustomAlertDialog
+            isVisible={isConfirmModalVisible}
+            title={confirmActionType === 'add' ? 'Add to Favorites?' : 'Remove from Favorites?'}
+            message={`Are you sure you want to ${confirmActionType === 'add' ? 'add' : 'remove'} ${confirmModalData.name.toUpperCase()} ${confirmActionType === 'add' ? 'to your team' : 'from your team'}?`}
+            imageUrl={confirmModalData.imageUrl}
+            imageAltText={`Image of ${confirmModalData.name}`}
+            onClose={handleCancelAction}
+            onConfirm={handleConfirmAction}
+            confirmButtonText={confirmActionType === 'add' ? 'Yes, Add!' : 'Yes, Remove!'}
+            cancelButtonText="Cancel"
+          />
+        )}
       </LinearGradient>
       <Footer /> 
     </ImageBackground>
@@ -355,8 +372,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    flex: 1, // Will be within ImageBackground, so still flex: 1
-    // background color should not be here, as ImageBackground handles it
+    flex: 1, 
   },
   headerContainer: {
     backgroundColor: '#bf4141',
@@ -404,6 +420,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
+    paddingVertical: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
@@ -435,7 +452,7 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   loadingText: {
-    color: '#fefefe',
+    color: '#ff0000',
     fontSize: 18,
     marginTop: 10,
   },
@@ -469,7 +486,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
-    // Background color set dynamically in renderPokemonCard
     marginHorizontal: CARD_MARGIN_HORIZONTAL / 2,
   },
   pokemonCardContent: {
@@ -484,7 +500,7 @@ const styles = StyleSheet.create({
     right: 8,
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#FFFFFF', // Changed to white for better contrast on colored cards
+    color: '#FFFFFF', 
   },
   pokemonImage: {
     width: '80%',
@@ -512,5 +528,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 'auto',
     marginBottom: 5,
+  },
+  heartIconContainer: {
+    position: 'absolute',
+    top: 5,
+    left: 5,
+    zIndex: 2,
+    padding: 5,
   },
 });

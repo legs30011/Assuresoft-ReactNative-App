@@ -9,17 +9,18 @@ import PokemonInfoScreen from './src/sections/pokemoninfo';
 import PokemonDetailScreen from './src/sections/pokemonDetailScreen/PokemonDetailScreen';
 import LocationDetailScreen from './src/sections/locationDetailScreen/LocationDetailScreen';
 import MovesScreen from './src/sections/moves/MovesScreen';
-import ItemsScreen from './src/sections/items/ItemsScreen';
-import NaturesScreen from './src/sections/natures/NaturesScreen';
 import TypeChartScreen from './src/sections/typeChart/TypeChartScreen';
 import { navigationRef } from './src/navigation/RootNavigation';
 import { RootStackParamList } from './src/types/navigation';
 import ComingSoonScreen from './src/sections/common/ComingSoonScreen';
+import YourTeamScreen from './src/sections/yourTeam/YourTeamScreen';
+import { FavoritesProvider } from './src/sections/context/FavoritesContext';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 function App(): React.JSX.Element {
   return (
+    <FavoritesProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.safeArea}>
         <NavigationContainer ref={navigationRef}>
@@ -36,13 +37,13 @@ function App(): React.JSX.Element {
             <Stack.Screen name="LocationDetailScreen" component={LocationDetailScreen} />
             <Stack.Screen name="ComingSoonScreen" component={ComingSoonScreen} />
             <Stack.Screen name="MovesScreen" component={MovesScreen} />
-            <Stack.Screen name="ItemsScreen" component={ItemsScreen} />
-            <Stack.Screen name="NaturesScreen" component={NaturesScreen} />
             <Stack.Screen name="TypeChartScreen" component={TypeChartScreen} />
+            <Stack.Screen name="YourTeamScreen" component={YourTeamScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
     </GestureHandlerRootView>
+    </FavoritesProvider>
   );
 }
 
