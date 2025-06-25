@@ -17,23 +17,17 @@ import { navigate } from '../../navigation/RootNavigation';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { RootStackParamList } from '../../types/navigation';
-import Footer from '../../sections/footer/Footer'; // Importa el componente Footer
+import Footer from '../../sections/footer/Footer';
 
 const { width } = Dimensions.get('window');
-
-// --- LOCAL ASSETS (ASEGÚRATE DE QUE ESTAS RUTAS Y EXTENSIONES SON EXACTAS) ---
 const BACKGROUND_IMAGE = require('../../assets/icons/pokedex.png');
 const POKEMON_CARD_ICON_LOCAL = require('../../assets/icons/pokeball.webp');
 const MOVES_CARD_ICON_LOCAL = require('../../assets/icons/fire.png');
 const EVOLUTION_CARD_ICON_LOCAL = require('../../assets/icons/evolution.png');
-
-// --- SEARCH/APP ICONS (AHORA SIN tintColor para estos, asumiendo que son imágenes precoloreadas) ---
 const SEARCH_ICON_LOCAL = require('../../assets/trainers/rival.webp');
 const MICROPHONE_ICON_LOCAL = require('../../assets/trainers/garyPokemon.webp'); 
 const APP_LOGO_IMAGE_LOCAL = require('../../assets/icons/pokedex.png');
 const NEW_HEADER_IMAGE = require('../../assets/trainers/pikachu.webp'); 
-
-// --- PLACEHOLDER ICONS (reemplazar con tus activos 3D locales más tarde) ---
 const TYPES_CARD_ICON_PLACEHOLDER = require('../../assets/trainers/rival.webp');
 
 
@@ -324,7 +318,6 @@ const styles = StyleSheet.create({
     height: 24,
     resizeMode: 'contain',
     marginRight: 10,
-    // tintColor: '#AAAAAA', // Removed tintColor
   },
   searchInput: {
     flex: 1,
