@@ -53,6 +53,7 @@ export type RootStackParamList = {
   UserScreen: undefined; 
   SettingsScreen: undefined; 
   YourTeamScreen: { initialTeam: PokemonListItemDisplay[] };
+  TypePracticeScreen: undefined;
 };
 declare global {
   namespace ReactNavigation {
@@ -64,4 +65,7 @@ export type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, '
 export type PokemonListScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PokemonListScreen'>;
 export type PokemonDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PokemonDetailScreen'>;
 export type YourTeamScreenNavigationProp = StackNavigationProp<RootStackParamList, 'YourTeamScreen'>;
-
+export type TypesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'TypeChartScreen'>;
+export type UserScreenNavigationProp = StackNavigationProp<RootStackParamList, 'UserScreen'>;
+export type TypeChartScreenNavigationProp = StackNavigationProp<RootStackParamList, 'TypeChartScreen'>
+export type TypePracticeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'TypePracticeScreen'>

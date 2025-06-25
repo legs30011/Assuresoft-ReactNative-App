@@ -7,9 +7,9 @@ import { RootStackParamList } from '../../types/navigation';
 const { width } = Dimensions.get('window');
 
 // --- FOOTER ICONS ---
-const HOME_FOOTER_ICON = require('../../assets/icons/pokeball.webp');
-const NOTIFICATIONS_FOOTER_ICON = require('../../assets/icons/pokeball.webp'); 
-const USER_FOOTER_ICON = require('../../assets/icons/pokeball.webp');
+const HOME_FOOTER_ICON = require('../../assets/icons/FooterPokeball.png');
+const NOTIFICATIONS_FOOTER_ICON = require('../../assets/icons/Notification.png'); 
+const USER_FOOTER_ICON = require('../../assets/icons/Profile.png');
 
 interface FooterProps {}
 
@@ -46,7 +46,7 @@ const Footer: React.FC<FooterProps> = () => {
 
         <TouchableOpacity
           style={styles.tabBarButton}
-          onPress={() => handleFooterNavigation('ComingSoonScreen', { from: 'User' })}
+          onPress={() => handleFooterNavigation('UserScreen', { from: 'User' })}
         >
           <Image
             source={USER_FOOTER_ICON}

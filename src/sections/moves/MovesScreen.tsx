@@ -10,12 +10,11 @@ import {
   Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { goBack } from '../../navigation/RootNavigation';
 import axios from 'axios';
 import LinearGradient from 'react-native-linear-gradient';
-import Footer from '../footer/Footer';
+import Footer from '../footer/Footer'; 
+import CustomHeader from '../customHeader/CustomHeader';
 import { JSX } from 'react/jsx-runtime';
-
 
 interface Move {
   name: string;
@@ -149,7 +148,7 @@ export default function MovesScreen(): JSX.Element {
     fetchMoves();
   }, [fetchMoves]);
 
-  const renderMoveItem = ({ item }: { item: MoveDisplay }): JSX.Element => (
+  const renderMoveItem = useCallback(({ item }: { item: MoveDisplay }): JSX.Element => (
     <View style={styles.cardContainer}>
       <LinearGradient
         colors={[item.primaryColor, item.secondaryColor]}
@@ -167,7 +166,7 @@ export default function MovesScreen(): JSX.Element {
         </Text>
       </LinearGradient>
     </View>
-  );
+  ), []); 
 
   return (
     <LinearGradient
@@ -176,18 +175,11 @@ export default function MovesScreen(): JSX.Element {
       end={{ x: 0, y: 1 }}
       style={styles.fullScreenGradient}
     >
-      <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'ios' ? 20 : 0) }]}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => goBack()} style={styles.backButtonHeader}>
-            <Text style={styles.backButtonTextHeader}>&lt;</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Moves</Text>
-          <View style={styles.headerRightPlaceholder} />
-        </View>
-
+      <CustomHeader title="Moves" showBackButton={true} /> 
+      <View style={[styles.contentContainer]}> 
         {loading ? (
           <View style={styles.centeredContent}>
-            <ActivityIndicator size="large" color="#EEFF00" />
+            <ActivityIndicator size="large" color="#ffffff" />
             <Text style={styles.loadingText}>Loading Moves...</Text>
           </View>
         ) : error ? (
@@ -223,39 +215,10 @@ const styles = StyleSheet.create({
   fullScreenGradient: {
     flex: 1,
   },
-  container: {
+  contentContainer: { 
     flex: 1,
     paddingHorizontal: HORIZONTAL_PADDING,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
-  },
-  backButtonHeader: {
-    padding: 5,
-  },
-  backButtonTextHeader: {
-    fontSize: 28,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#EEFF00',
-    textAlign: 'center',
-    flex: 1,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 5,
-  },
-  headerRightPlaceholder: {
-    width: 38,
+    marginBottom: 30,
   },
   centeredContent: {
     flex: 1,
@@ -313,4 +276,3 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
 });
-4

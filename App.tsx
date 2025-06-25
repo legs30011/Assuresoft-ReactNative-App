@@ -9,12 +9,14 @@ import PokemonInfoScreen from './src/sections/pokemoninfo';
 import PokemonDetailScreen from './src/sections/pokemonDetailScreen/PokemonDetailScreen';
 import LocationDetailScreen from './src/sections/locationDetailScreen/LocationDetailScreen';
 import MovesScreen from './src/sections/moves/MovesScreen';
-import TypeChartScreen from './src/sections/typeChart/TypeChartScreen';
 import { navigationRef } from './src/navigation/RootNavigation';
 import { RootStackParamList } from './src/types/navigation';
 import ComingSoonScreen from './src/sections/common/ComingSoonScreen';
 import YourTeamScreen from './src/sections/yourTeam/YourTeamScreen';
 import { FavoritesProvider } from './src/sections/context/FavoritesContext';
+import { UserScreen } from './src/sections/profile/profile';
+import TypePracticeScreen from './src/sections/typeChart/TypePracticeScreen';
+import {TypeChartScreen}  from './src/sections/typeChart/TypeChartScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -39,6 +41,8 @@ function App(): React.JSX.Element {
             <Stack.Screen name="MovesScreen" component={MovesScreen} />
             <Stack.Screen name="TypeChartScreen" component={TypeChartScreen} />
             <Stack.Screen name="YourTeamScreen" component={YourTeamScreen} />
+            <Stack.Screen name="UserScreen" component={UserScreen} />
+            <Stack.Screen name="TypePracticeScreen" component={TypePracticeScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
