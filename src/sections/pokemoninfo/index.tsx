@@ -20,8 +20,8 @@ import { navigate } from '../../navigation/RootNavigation';
 import CustomAlertDialog from '../../components/customAlertDialog/CustomAlertDialog';
 import Footer from '../footer/Footer';
 import { LinearGradient } from 'react-native-linear-gradient';
-import { PokemonListItemDisplay } from '../../types/navigation'; // Import the shared type
-import { useFavorites } from '../context/FavoritesContext'; // NEW IMPORT
+import { PokemonListItemDisplay } from '../../types/navigation'; 
+import { useFavorites } from '../context/FavoritesContext';
 import { JSX } from 'react/jsx-runtime';
 
 const { width } = Dimensions.get('window');
@@ -32,9 +32,6 @@ const CONTAINER_HORIZONTAL_PADDING = 20;
 const CALCULATED_CARD_WIDTH =
   (width - (CONTAINER_HORIZONTAL_PADDING * 2) - (CARD_MARGIN_HORIZONTAL * (NUM_COLUMNS - 1))) / NUM_COLUMNS;
 const BACKGROUND_IMAGE = require('../../assets/icons/pokedex.png');
-
-// --- TYPE DEFINITIONS (MOVED TO navigation.d.ts for global access) ---
-
 const POKEMON_TYPE_COLORS: { [key: string]: string } = {
   normal: '#A8A77A',
   fire: '#FD7D24',
@@ -107,7 +104,7 @@ const HeartIcon = ({ isFilled, size = 24, color = 'white' }: { isFilled: boolean
 
 export default function PokemonListScreen({ selectedType }: { selectedType?: string }): JSX.Element {
   const insets = useSafeAreaInsets();
-  const { likedPokemons, toggleFavorite } = useFavorites(); // USE CONTEXT
+  const { likedPokemons, toggleFavorite } = useFavorites(); 
 
   const [allPokemons, setAllPokemons] = useState<PokemonListItemDisplay[]>([]);
   const [filteredPokemons, setFilteredPokemons] = useState<PokemonListItemDisplay[]>([]);
@@ -132,7 +129,7 @@ export default function PokemonListScreen({ selectedType }: { selectedType?: str
 
   const handleConfirmAction = () => {
     if (confirmModalData) {
-      toggleFavorite(confirmModalData); // Use context's toggleFavorite
+      toggleFavorite(confirmModalData);
     }
     setIsConfirmModalVisible(false);
     setConfirmModalData(null);
@@ -168,7 +165,7 @@ export default function PokemonListScreen({ selectedType }: { selectedType?: str
                     detailResponse.data.sprites?.front_default ||
                     'https://placehold.co/96x96/E0E0E0/999999?text=No+Img',
           primaryTypeColor: primaryColor,
-        } as PokemonListItemDisplay; // Explicitly cast
+        } as PokemonListItemDisplay;
       });
 
       let pokemonsWithDetails = await Promise.all(pokemonDetailsPromises);
@@ -452,7 +449,7 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   loadingText: {
-    color: '#ff0000',
+    color: '#ffffff',
     fontSize: 18,
     marginTop: 10,
   },
