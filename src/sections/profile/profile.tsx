@@ -9,35 +9,36 @@ import {
   Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import CustomHeader from '../customHeader/CustomHeader'; 
-import Footer from '../footer/Footer'; 
-import { useFavorites } from '../context/FavoritesContext'; 
-import { PokemonListItemDisplay } from '../../types/navigation'
+import CustomHeader from '../customHeader/CustomHeader';
+import Footer from '../footer/Footer';
+import { useFavorites } from '../context/FavoritesContext';
+import { PokemonListItemDisplay } from '../../types/navigation';
 import { JSX } from 'react/jsx-runtime';
 
 const { width } = Dimensions.get('window');
-const TRAINER_AVATAR = require('../../assets/trainers/ashPokemon.webp'); 
-const BADGE_PLACEHOLDER1= require('../../assets/icons/m1.png');
-const BADGE_PLACEHOLDER2= require('../../assets/icons/m2.png');
-const BADGE_PLACEHOLDER3= require('../../assets/icons/m3.png');
+const TRAINER_AVATAR = require('../../assets/trainers/ashPokemon.webp');
+const BADGE_PLACEHOLDER1 = require('../../assets/icons/m1.png');
+const BADGE_PLACEHOLDER2 = require('../../assets/icons/m2.png');
+const BADGE_PLACEHOLDER3 = require('../../assets/icons/m3.png');
 
 export const UserScreen: React.FC = (): JSX.Element => {
-  const { likedPokemons } = useFavorites(); 
+  const { likedPokemons } = useFavorites();
 
   const trainer = {
     name: 'Ash Ketchum',
-    hometown: 'Pueblo Paleta',
-    description: '¡Un entrenador Pokémon decidido con el sueño de convertirse en Maestro Pokémon! Siempre en una aventura con su fiel Pikachu.',
+    hometown: 'Pallet Town',
+    description: 'A determined Pokémon trainer with the dream of becoming a Pokémon Master! Always on an adventure with his loyal Pikachu.',
     badges: [
-      { id: '1', name: 'Medalla Roca', icon: BADGE_PLACEHOLDER1 },
-      { id: '2', name: 'Medalla Cascada', icon: BADGE_PLACEHOLDER2 },
-      { id: '3', name: 'Medalla Trueno', icon: BADGE_PLACEHOLDER3 },
+      { id: '1', name: 'Boulder Badge', icon: BADGE_PLACEHOLDER1 },
+      { id: '2', name: 'Cascade Badge', icon: BADGE_PLACEHOLDER2 },
+      { id: '3', name: 'Thunder Badge', icon: BADGE_PLACEHOLDER3 },
     ],
   };
+
   const renderFavoritePokemon = ({ item }: { item: PokemonListItemDisplay }): JSX.Element => (
     <View style={styles.favoritePokemonCard}>
       <Image
-        source={{ uri: item.imageUrl || '../../assets/icons/Profile.png' }} 
+        source={{ uri: item.imageUrl || '../../assets/icons/Profile.png' }}
         style={styles.favoritePokemonImage}
       />
       <Text style={styles.favoritePokemonName}>{item.name.toUpperCase()}</Text>
@@ -51,7 +52,7 @@ export const UserScreen: React.FC = (): JSX.Element => {
       end={{ x: 0, y: 1 }}
       style={styles.fullScreenGradient}
     >
-      <CustomHeader title="Perfil del Entrenador" showBackButton={true} />
+      <CustomHeader title="Trainer Profile" showBackButton={true} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileContainer}>
@@ -61,7 +62,7 @@ export const UserScreen: React.FC = (): JSX.Element => {
           <Text style={styles.trainerDescription}>{trainer.description}</Text>
 
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Medallas</Text>
+            <Text style={styles.sectionTitle}>Badges</Text>
           </View>
           {trainer.badges.length > 0 ? (
             <View style={styles.badgesContainer}>
@@ -73,24 +74,24 @@ export const UserScreen: React.FC = (): JSX.Element => {
               ))}
             </View>
           ) : (
-            <Text style={styles.noDataText}>¡Aún no se han recolectado medallas!</Text>
+            <Text style={styles.noDataText}>No badges collected yet!</Text>
           )}
 
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Tus Pokémon Favoritos</Text>
+            <Text style={styles.sectionTitle}>Your Favorite Pokémon</Text>
           </View>
           {likedPokemons.length > 0 ? (
             <FlatList
               data={likedPokemons}
               keyExtractor={(item) => String(item.id)}
               renderItem={renderFavoritePokemon}
-              numColumns={2} 
+              numColumns={2}
               columnWrapperStyle={styles.favoritePokemonColumnWrapper}
               contentContainerStyle={styles.favoritePokemonListContent}
-              scrollEnabled={false} 
+              scrollEnabled={false}
             />
           ) : (
-            <Text style={styles.noDataText}>¡Aún no se han añadido Pokémon favoritos. ¡Ve a atraparlos!</Text>
+            <Text style={styles.noDataText}>No favorite Pokémon added yet. Go catch 'em!</Text>
           )}
         </View>
       </ScrollView>
@@ -104,9 +105,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1, 
+    flexGrow: 1,
     paddingHorizontal: 20,
-    paddingBottom: 100, 
+    paddingBottom: 100,
   },
   profileContainer: {
     alignItems: 'center',
@@ -115,11 +116,11 @@ const styles = StyleSheet.create({
   trainerAvatar: {
     width: 150,
     height: 150,
-    borderRadius: 75, 
+    borderRadius: 75,
     borderWidth: 4,
     borderColor: '#EEFF00',
     marginBottom: 20,
-    backgroundColor: '#333333', 
+    backgroundColor: '#333333',
   },
   trainerName: {
     fontSize: 28,
@@ -138,25 +139,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginHorizontal: 10,
     marginBottom: 30,
-    lineHeight: 22, 
+    lineHeight: 22,
   },
   sectionHeader: {
     width: '100%',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)', 
+    borderBottomColor: 'rgba(255,255,255,0.1)',
     marginBottom: 15,
     alignItems: 'center',
   },
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#EEFF00', 
+    color: '#EEFF00',
   },
   badgesContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap', 
-    justifyContent: 'center', 
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     marginBottom: 30,
   },
   badgeItem: {
@@ -185,13 +186,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   favoritePokemonColumnWrapper: {
-    justifyContent: 'space-around', 
+    justifyContent: 'space-around',
     marginBottom: 15,
   },
   favoritePokemonCard: {
     width: (width - 40 - 30) / 2,
     alignItems: 'center',
-    backgroundColor: 'rgba(50,50,50,0.8)', 
+    backgroundColor: 'rgba(50,50,50,0.8)',
     borderRadius: 15,
     padding: 10,
     shadowColor: '#000',
