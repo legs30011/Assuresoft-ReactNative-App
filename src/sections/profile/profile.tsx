@@ -18,7 +18,9 @@ import { JSX } from 'react/jsx-runtime';
 
 const { width } = Dimensions.get('window');
 const TRAINER_AVATAR = require('../../assets/trainers/ashPokemon.webp'); 
-const BADGE_PLACEHOLDER = require('../../assets/icons/pokeball.webp');
+const BADGE_PLACEHOLDER1= require('../../assets/icons/m1.png');
+const BADGE_PLACEHOLDER2= require('../../assets/icons/m2.png');
+const BADGE_PLACEHOLDER3= require('../../assets/icons/m3.png');
 
 export const UserScreen: React.FC = (): JSX.Element => {
   const { likedPokemons } = useFavorites(); 
@@ -28,9 +30,9 @@ export const UserScreen: React.FC = (): JSX.Element => {
     hometown: 'Pueblo Paleta',
     description: '¡Un entrenador Pokémon decidido con el sueño de convertirse en Maestro Pokémon! Siempre en una aventura con su fiel Pikachu.',
     badges: [
-      { id: '1', name: 'Medalla Roca', icon: BADGE_PLACEHOLDER },
-      { id: '2', name: 'Medalla Cascada', icon: BADGE_PLACEHOLDER },
-      { id: '3', name: 'Medalla Trueno', icon: BADGE_PLACEHOLDER },
+      { id: '1', name: 'Medalla Roca', icon: BADGE_PLACEHOLDER1 },
+      { id: '2', name: 'Medalla Cascada', icon: BADGE_PLACEHOLDER2 },
+      { id: '3', name: 'Medalla Trueno', icon: BADGE_PLACEHOLDER3 },
     ],
   };
   const renderFavoritePokemon = ({ item }: { item: PokemonListItemDisplay }): JSX.Element => (
