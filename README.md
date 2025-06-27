@@ -195,21 +195,15 @@ Search by Number:
 <img src="src/assets/screenShots/i4.png" height="24" width="24">
 Search by Word (Name):
 <img src="src/assets/screenShots/i5.png" height="24" width="24">
-Search by Word (Name):
+Your Team:
 <img src="src/assets/screenShots/i6.png" height="24" width="24">
-Search by Word (Name):
+Remove Pokemon from Team:
 <img src="src/assets/screenShots/i7.png" height="24" width="24">
-Search by Word (Name):
-<img src="src/assets/screenShots/i8.png" height="24" width="24">
-Search by Word (Name):
+Moves Page:
 <img src="src/assets/screenShots/i9.png" height="24" width="24">
-Search by Word (Name):
-<img src="src/assets/screenShots/i10.png" height="24" width="24">
-Search by Word (Name):
-<img src="src/assets/screenShots/i11.png" height="24" width="24">
-Search by Word (Name):
+Types Page:
 <img src="src/assets/screenShots/i12.png" height="24" width="24">
-Search by Word (Name):
+Search by Number:
 <img src="src/assets/screenShots/i13.png" height="24" width="24">
 
 Dependencies
@@ -312,5 +306,6 @@ npx react-native run-ios
 # For Android: 
 npx react-native run-android
 License
+## Licence:
 This project is licensed under the MIT License - see the LICENSE file for details.
 &lt;/immersive>

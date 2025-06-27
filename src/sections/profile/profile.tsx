@@ -8,7 +8,6 @@ import {
   FlatList,
   Dimensions,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import CustomHeader from '../customHeader/CustomHeader'; 
 import Footer from '../footer/Footer'; 
