@@ -54,7 +54,6 @@ export default function LocationDetailScreen() {
       );
 
       if (foundLocationArea) {
-        // Ahora obtenemos los detalles de esa área de ubicación, incluyendo encuentros
         const areaIdMatch = foundLocationArea.url.match(/\/(\d+)\/$/);
         const areaId = areaIdMatch ? parseInt(areaIdMatch[1], 10) : null;
 
@@ -70,7 +69,6 @@ export default function LocationDetailScreen() {
           setError(`No se pudo obtener el ID para el área de ubicación: ${locationName}`);
         }
       } else {
-        // Si no se encuentra la ubicación, es un error 404
         setError(`No se encontraron detalles para la ubicación: "${locationName}". Es posible que no exista una "área de ubicación" para este nombre o su formato es diferente.`);
       }
 

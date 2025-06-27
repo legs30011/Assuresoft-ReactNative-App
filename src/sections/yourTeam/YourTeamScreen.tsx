@@ -26,12 +26,6 @@ const CONTAINER_HORIZONTAL_PADDING = 20;
 const CALCULATED_CARD_WIDTH =
   (width - (CONTAINER_HORIZONTAL_PADDING * 2) - (CARD_MARGIN_HORIZONTAL * (NUM_COLUMNS - 1))) / NUM_COLUMNS;
 
-const HeartIcon = ({ isFilled, size = 24, color = 'white' }: { isFilled: boolean; size?: number; color?: string; }): JSX.Element => (
-  <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
-    <Text style={{ fontSize: size, color: color }}>{isFilled ? '❤️' : '🤍'}</Text>
-  </View>
-);
-
 export default function YourTeamScreen(): JSX.Element {
   const insets = useSafeAreaInsets();
   const { likedPokemons, toggleFavorite } = useFavorites();

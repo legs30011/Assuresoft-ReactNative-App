@@ -9,8 +9,6 @@ import {
   Platform,
   Image,
   ImageBackground,
-  TextInput,
-  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { navigate } from '../../navigation/RootNavigation';
@@ -23,9 +21,7 @@ const { width } = Dimensions.get('window');
 const BACKGROUND_IMAGE = require('../../assets/icons/pokedex.png');
 const POKEMON_CARD_ICON_LOCAL = require('../../assets/icons/pokeball.webp');
 const MOVES_CARD_ICON_LOCAL = require('../../assets/icons/fire.png');
-const TEAM_CARD_ICON_LOCAL = require('../../assets/trainers/ashPokemon.webp');
-const SEARCH_ICON_LOCAL = require('../../assets/trainers/rival.webp');
-const MICROPHONE_ICON_LOCAL = require('../../assets/trainers/garyPokemon.webp'); 
+const TEAM_CARD_ICON_LOCAL = require('../../assets/trainers/ashPokemon.webp'); 
 const NEW_HEADER_IMAGE = require('../../assets/trainers/pikachu.webp'); 
 const TYPES_CARD_ICON_PLACEHOLDER = require('../../assets/trainers/rival.webp');
 
@@ -177,43 +173,6 @@ export default function HomeScreen() {
               </View>
               <Text style={styles.greetingSubtitle}>WELCOME TO POKEDEX</Text>
             </View>
-            <View style={styles.searchContainer}>
-              <Image
-                source={SEARCH_ICON_LOCAL}
-                style={[styles.searchIcon, { tintColor: undefined }]} 
-              />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search pokemons, items, abilities, e etc ."
-                placeholderTextColor="#c3c3c3"
-                value={searchText}
-                onChangeText={handleSearchInputChange}
-                onSubmitEditing={() => performUniversalSearch(searchText)}
-              />
-              <TouchableOpacity onPress={() => performUniversalSearch(searchText)}>
-                <Image
-                  source={MICROPHONE_ICON_LOCAL}
-                  style={[styles.microphoneIcon, { tintColor: undefined }]}
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Search Results Display Area */}
-            {showSearchResults && (
-              <View style={styles.searchResultsContainer}>
-                {loadingSearch ? (
-                  <ActivityIndicator size="small" color="#EEFF00" />
-                ) : searchResults.length > 0 ? (
-                  searchResults.map((result, idx) => (
-                    <Text key={idx} style={styles.searchResultText}>
-                      {result.type}: {result.name} (ID: {result.id || 'N/A'})
-                    </Text>
-                  ))
-                ) : (
-                  <Text style={styles.searchResultText}>No results found for "{searchText}".</Text>
-                )}
-              </View>
-            )}
             <ScrollView contentContainerStyle={styles.scrollContent}>
               <View style={styles.gridContainer}>
                 {menuItems.map((item, index) => (

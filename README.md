@@ -15,7 +15,7 @@ Welcome to **AssureDex**, a robust and feature-rich React Native application des
 * [Troubleshooting](#troubleshooting)
 * [License](#license)
 
----
+---`
 
 ## Features
 
@@ -93,7 +93,6 @@ Follow these steps to get AssureDex up and running on your local machine:
           assets: [
             './node_modules/react-native-vector-icons/Fonts/', // Required for react-native-vector-icons
             './assets/fonts/', // If you have custom fonts in this directory
-            // Add other asset folders here if they need explicit linking, e.g., './assets/images/'
           ],
         };
         ```
@@ -187,15 +186,31 @@ AssureDex/
 ## Visuals
 Examples
 Home Screen:
-<img src="src/assets/screenShots/1s.png" height="24" width="24">
+<img src="src/assets/screenShots/i1.png" height="24" width="24">
 Pokédex Start (List View):
-<img src="src/assets/screenShots/2s.png" height="24" width="24">
+<img src="src/assets/screenShots/i2.png" height="24" width="24">
 Pokémon Detail Information:
-<img src="src/assets/screenShots/3s.png" height="24" width="24">
+<img src="src/assets/screenShots/i3.png" height="24" width="24">
 Search by Number:
-<img src="src/assets/screenShots/4s.png" height="24" width="24">
+<img src="src/assets/screenShots/i4.png" height="24" width="24">
 Search by Word (Name):
-<img src="src/assets/screenShots/5s.png" height="24" width="24">
+<img src="src/assets/screenShots/i5.png" height="24" width="24">
+Search by Word (Name):
+<img src="src/assets/screenShots/i6.png" height="24" width="24">
+Search by Word (Name):
+<img src="src/assets/screenShots/i7.png" height="24" width="24">
+Search by Word (Name):
+<img src="src/assets/screenShots/i8.png" height="24" width="24">
+Search by Word (Name):
+<img src="src/assets/screenShots/i9.png" height="24" width="24">
+Search by Word (Name):
+<img src="src/assets/screenShots/i10.png" height="24" width="24">
+Search by Word (Name):
+<img src="src/assets/screenShots/i11.png" height="24" width="24">
+Search by Word (Name):
+<img src="src/assets/screenShots/i12.png" height="24" width="24">
+Search by Word (Name):
+<img src="src/assets/screenShots/i13.png" height="24" width="24">
 
 Dependencies
 Key dependencies utilized in this project (as per package.json):

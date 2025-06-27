@@ -4,10 +4,10 @@ import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 interface SvgIconProps {
-  pathData: string; // The 'd' attribute value of the SVG path
+  pathData: string; 
   size?: number;
   color?: string;
-  viewBox?: string; // Optional: specify viewBox if needed for complex SVGs
+  viewBox?: string; 
   style?: any;
 }
 

@@ -3,10 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Platform,
   Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -92,7 +90,6 @@ interface MoveDisplay {
 }
 
 export default function MovesScreen(): JSX.Element {
-  const insets = useSafeAreaInsets();
   const [moves, setMoves] = useState<MoveDisplay[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
